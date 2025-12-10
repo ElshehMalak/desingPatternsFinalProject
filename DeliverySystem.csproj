@@ -64,6 +64,7 @@
     <Compile Include="OrderSelectionForm.Designer.cs">
       <DependentUpon>OrderSelectionForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Patterns\behavioral\OrderStatePattern.cs" />
     <Compile Include="Patterns\Creational\DeliveryManager.cs" />
     <Compile Include="Patterns\Creational\Factory.cs" />
     <Compile Include="Program.cs" />

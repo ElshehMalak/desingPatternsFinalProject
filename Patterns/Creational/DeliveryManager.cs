@@ -12,11 +12,11 @@ namespace DeliverySystem.Patterns.Creational
     public sealed class DeliveryManager
     {
         private static DeliveryManager _instance = null;
-        public List<string> OrdersDB { get; private set; }
+        public List<Order> OrdersDB { get; private set; }
         public List<Store> StoresDB { get; private set; }
         private DeliveryManager()
         {
-            OrdersDB = new List<string>();
+            OrdersDB = new List<Order>();
             StoresDB = new List<Store>();
 
             var burgerKing = new Store("Burger King", StoreCategory.FoodAndCoffee);
@@ -44,11 +44,11 @@ namespace DeliverySystem.Patterns.Creational
             }
         }
 
-        public void AddOrder(string orderDetails)
+        public void AddOrder(Order orderDetails)
         {
             OrdersDB.Add(orderDetails);
         }
-        public List<string> GetAllOrders()
+        public List<Order> GetAllOrders()
         {
             return OrdersDB;
         }

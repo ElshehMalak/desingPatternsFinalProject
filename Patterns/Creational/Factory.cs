@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using  desingPatternsFinalProject.Behavioral;
+
 
 namespace DeliverySystem.Patterns.Creational
 {
@@ -51,7 +53,9 @@ namespace DeliverySystem.Patterns.Creational
             public StoreCategory Category { get; set; }
             public string StoreName { get; set; }
             public List<OrderItem> Items { get; set; }
+            public IOrderState CurrentState { get; set; }
             public DateTime OrderDate { get; set; }
+
 
             public Order(Customer customer, StoreCategory category, string storeName)
             {
@@ -61,6 +65,7 @@ namespace DeliverySystem.Patterns.Creational
                 Items = new List<OrderItem>();
                 OrderDate = DateTime.Now;
                 OrderNumber = GenerateOrderNumber();
+                CurrentState = new PendingState();
             }
 
             private string GenerateOrderNumber()
@@ -84,7 +89,15 @@ namespace DeliverySystem.Patterns.Creational
             {
                 return $"#{OrderNumber} | {Category} | {CalculateTotal():C}";
             }
-        }
+            public void NextState()
+            {
+                CurrentState.Proceed(this);
+            }
+            public string GetStatusString()
+            {
+                return CurrentState.GetStatusName();
+            }
+    }
         public class FoodAndCoffeeOrder : Order
         {
             public FoodAndCoffeeOrder(Customer customer, string storeName) : base(customer, StoreCategory.FoodAndCoffee, storeName) { }

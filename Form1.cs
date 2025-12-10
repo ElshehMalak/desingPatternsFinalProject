@@ -9,6 +9,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using DeliverySystem.Patterns.Creational;
+using static DeliverySystem.Patterns.Creational.Order;
+
+using desingPatternsFinalProject.Behavioral;
 using static desingPatternsFinalProject.Program;
 using StoreCategory =  DeliverySystem.Patterns.Creational.StoreCategory;
 
@@ -83,13 +86,13 @@ namespace desingPatternsFinalProject
 
             using (var shopForm = new OrderSelectionForm(customer, selectedStore))
             {
-                this.Hide();
+                //this.Hide();
 
                 if (shopForm.ShowDialog() == DialogResult.OK)
                 {
                     var finalOrder = shopForm.CreatedOrder;
 
-                    DeliveryManager.Instance.AddOrder(finalOrder.ToString());
+                    DeliveryManager.Instance.AddOrder(finalOrder);
 
                     MessageBox.Show(
                         $"تم استلام طلبك بنجاح! ✅\n" +
@@ -99,7 +102,7 @@ namespace desingPatternsFinalProject
                         "نجاح العملية");
                 }
 
-                this.Show(); // إظهار الفورم مجدداً  
+                this.Show(); 
             }
         }
 
@@ -112,6 +115,78 @@ namespace desingPatternsFinalProject
         {
             txtSearch.Text = ""; // نصفر البحث
             UpdateStoreList();
+        }
+
+        private void RefreshAdminGrid()
+        {
+            dgvOrders.DataSource = null;
+            var allOrders = DeliveryManager.Instance.OrdersDB;
+
+            // Assuming `o` is a string, replace `o.StoreName` with `o` directly.
+            dgvOrders.DataSource = allOrders.Select(o => new
+            {
+                ID = o.OrderNumber,          // سميناه ID
+                Store = o.StoreName ,          // Use `o` directly since `o` is a string
+                Customer = o.OrderNumber,  // سميناه Customer
+                Status = o.GetStatusString(),
+                Total = o.CalculateTotal()
+            }).ToList();
+
+            // Update column headers
+            dgvOrders.Columns["ID"].HeaderText = "رقم الطلب";
+            dgvOrders.Columns["Store"].HeaderText = "المتجر";
+            dgvOrders.Columns["Customer"].HeaderText = "العميل";
+            dgvOrders.Columns["Status"].HeaderText = "حالة الطلب";
+            dgvOrders.Columns["Total"].HeaderText = "الإجمالي";
+        }
+        private void btnStartCooking_Click(object sender, EventArgs e)
+        {
+            ChangeOrderStatus<PendingState>();
+        }
+        private void ChangeOrderStatus<T>() where T : IOrderState
+        {
+            if (dgvOrders.CurrentRow == null)
+            {
+                MessageBox.Show("الرجاء اختيار طلب من الجدول!");
+                return;
+            }
+
+            string orderNum = dgvOrders.CurrentRow.Cells[0].Value.ToString();
+
+            // Assuming `OrdersDB` contains objects of a class (not strings) that has a `CurrentState` property.  
+            var order = DeliveryManager.Instance.OrdersDB.FirstOrDefault(o => o.OrderNumber == orderNum);
+
+            if (order != null)
+            {
+                if (order.CurrentState is T)
+                {
+                    // ✅ نعم، هو في الحالة الصحيحة -> انتقل للحالة التالية  
+                    order.NextState();
+
+                    // تحديث الجدول لنرى الحالة الجديدة  
+                    RefreshAdminGrid();
+                }
+                else
+                {
+                    // ❌ لا، المدير يحاول تخطي مرحلة (مثلاً تسليم طلب لم يطبخ بعد)  
+                    MessageBox.Show($"خطأ في التسلسل!\nحالة الطلب الحالية هي: {order.GetStatusString()} \nلا يمكن تنفيذ هذا الزر الآن.");
+                }
+            }
+        }
+
+        private void btnShipOrder_Click(object sender, EventArgs e)
+        {
+            ChangeOrderStatus<CookingState>();
+        }
+
+        private void btnCompleteOrder_Click(object sender, EventArgs e)
+        {
+            ChangeOrderStatus<OnTheWayState>();
+        }
+
+        private void btnRefreshAdmin_Click(object sender, EventArgs e)
+        {
+            RefreshAdminGrid();
         }
     }
 }
