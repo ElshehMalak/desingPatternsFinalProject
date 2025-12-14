@@ -60,6 +60,7 @@
             this.groupbShoppingCart.TabIndex = 0;
             this.groupbShoppingCart.TabStop = false;
             this.groupbShoppingCart.Text = "Shopping Cart";
+            this.groupbShoppingCart.Enter += new System.EventHandler(this.groupbShoppingCart_Enter);
             // 
             // btnSubmit
             // 
@@ -126,14 +127,14 @@
             this.groupBox2.Font = new System.Drawing.Font("Tahoma", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox2.Location = new System.Drawing.Point(12, 12);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(398, 369);
+            this.groupBox2.Size = new System.Drawing.Size(398, 424);
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "groupBox2";
             // 
             // numQty
             // 
-            this.numQty.Location = new System.Drawing.Point(36, 304);
+            this.numQty.Location = new System.Drawing.Point(19, 381);
             this.numQty.Name = "numQty";
             this.numQty.Size = new System.Drawing.Size(93, 28);
             this.numQty.TabIndex = 5;
@@ -156,7 +157,7 @@
             // 
             // btnAdd
             // 
-            this.btnAdd.Location = new System.Drawing.Point(156, 294);
+            this.btnAdd.Location = new System.Drawing.Point(136, 371);
             this.btnAdd.Name = "btnAdd";
             this.btnAdd.Size = new System.Drawing.Size(105, 44);
             this.btnAdd.TabIndex = 2;
@@ -166,7 +167,7 @@
             // 
             // btnRemove
             // 
-            this.btnRemove.Location = new System.Drawing.Point(275, 294);
+            this.btnRemove.Location = new System.Drawing.Point(258, 371);
             this.btnRemove.Name = "btnRemove";
             this.btnRemove.Size = new System.Drawing.Size(105, 44);
             this.btnRemove.TabIndex = 1;
@@ -182,7 +183,7 @@
             this.Menu.Location = new System.Drawing.Point(19, 81);
             this.Menu.Name = "Menu";
             this.Menu.ScrollAlwaysVisible = true;
-            this.Menu.Size = new System.Drawing.Size(361, 193);
+            this.Menu.Size = new System.Drawing.Size(361, 256);
             this.Menu.TabIndex = 0;
             this.Menu.SelectedIndexChanged += new System.EventHandler(this.lstMenu_SelectedIndexChanged);
             // 

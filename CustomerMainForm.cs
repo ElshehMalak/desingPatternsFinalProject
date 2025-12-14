@@ -14,61 +14,32 @@ using static DeliverySystem.Patterns.Creational.Order;
 using desingPatternsFinalProject.Behavioral;
 using static desingPatternsFinalProject.Program;
 using StoreCategory =  DeliverySystem.Patterns.Creational.StoreCategory;
+using desingPatternsFinalProject.Patterns.Creational;
+using desingPatternsFinalProject.Patterns;
 
 
 namespace desingPatternsFinalProject
 {
-    public partial class Form1 : Form
+    public partial class CustomerMainForm : Form
     {
-        public Form1()
+        public CustomerMainForm()
         {
             InitializeComponent();
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            cmbType.DataSource = Enum.GetValues(typeof(StoreCategory));
-
-            cmbType.SelectedIndex = 0;
-
-            UpdateStoreList();
-
+            lblWelcome.Text = "Welcome, " + UserSession.CurrentUserName + " 👋";  
         }
-      
-        private void UpdateStoreList()
-        {
-            if (cmbType.SelectedValue == null) return;
-
-            StoreCategory category;
-            Enum.TryParse(cmbType.SelectedValue.ToString(), out category);
-
-            string searchText = txtSearch.Text;
-
-            var results = DeliveryManager.Instance.SearchStores(category, searchText);
-
-            lstStores.DataSource = null;      
-            lstStores.DataSource = results;   
-            lstStores.DisplayMember = "Name";
-        }
-        
-
+     
         private void tabPage1_Click(object sender, EventArgs e)
         {
 
         }
-
-        private void label3_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void lblNumber_Click(object sender, EventArgs e)
-        {
-
-        }
-
+        /*
         private void btnCreateOrder_Click(object sender, EventArgs e)
         {
+            
             if (string.IsNullOrWhiteSpace(txtName.Text) || string.IsNullOrWhiteSpace(txtPhone.Text))
             {
                 MessageBox.Show("الرجاء إدخال اسمك ورقم الهاتف!", "بيانات ناقصة", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -104,19 +75,9 @@ namespace desingPatternsFinalProject
 
                 this.Show(); 
             }
-        }
-
-        private void txtSearch_TextChanged(object sender, EventArgs e)
-        {
-            UpdateStoreList();
-        }
-
-        private void cmbType_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            txtSearch.Text = ""; // نصفر البحث
-            UpdateStoreList();
-        }
-
+            
+        }*/
+        /*
         private void RefreshAdminGrid()
         {
             dgvOrders.DataSource = null;
@@ -139,6 +100,7 @@ namespace desingPatternsFinalProject
             dgvOrders.Columns["Status"].HeaderText = "حالة الطلب";
             dgvOrders.Columns["Total"].HeaderText = "الإجمالي";
         }
+        
         private void btnStartCooking_Click(object sender, EventArgs e)
         {
             ChangeOrderStatus<PendingState>();
@@ -187,6 +149,36 @@ namespace desingPatternsFinalProject
         private void btnRefreshAdmin_Click(object sender, EventArgs e)
         {
             RefreshAdminGrid();
+        }
+        */
+        private void btnRestaurants_Click(object sender, EventArgs e)
+        {
+            RestaurantListForm foodForm = new RestaurantListForm();
+            foodForm.Show();
+        }
+        
+
+        private void btnStore_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnSupermarket_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Supermarket section is coming soon! 🛒");
+        }
+
+        private void btnCourierService_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnLogOut_Click(object sender, EventArgs e)
+        {
+            UserSession.ClearSession(); // نمسحوا الذاكرة
+            LoginForm login = new LoginForm(); // نرجعوا للدخول
+            login.Show();
+            this.Close();
         }
     }
 }

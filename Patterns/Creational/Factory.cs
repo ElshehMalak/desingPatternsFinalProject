@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using  desingPatternsFinalProject.Behavioral;
+using DeliverySystem.Patterns.Creational;
+using desingPatternsFinalProject.Patterns.Creational;
 
 
 namespace DeliverySystem.Patterns.Creational
@@ -28,11 +30,13 @@ namespace DeliverySystem.Patterns.Creational
                 Menu = new List<Product>();
             }
         }
+    /*
         public class Customer
         {
             public string Name { get; set; }
             public string Phone { get; set; }
         }
+    */
         public class Product
         {
             public string Name { get; set; }
@@ -49,7 +53,7 @@ namespace DeliverySystem.Patterns.Creational
         public abstract class Order
         {
             public string OrderNumber { get; set; }
-            public Customer Customer { get; set; }
+            public User Customer { get; set; }
             public StoreCategory Category { get; set; }
             public string StoreName { get; set; }
             public List<OrderItem> Items { get; set; }

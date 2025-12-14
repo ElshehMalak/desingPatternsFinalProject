@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using DeliverySystem.Patterns.Creational;
+using desingPatternsFinalProject.Patterns.Creational;
 
 namespace desingPatternsFinalProject
 {
@@ -86,6 +87,11 @@ namespace desingPatternsFinalProject
         {
             decimal total = _cartItems.Sum(x => x.GetTotal());
             lblTotal.Text = $"{total:C}";
+        }
+
+        private void groupbShoppingCart_Enter(object sender, EventArgs e)
+        {
+
         }
     }
 }
