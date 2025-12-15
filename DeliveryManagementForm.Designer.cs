@@ -58,6 +58,7 @@
             this.btnStartCooking.TabIndex = 1;
             this.btnStartCooking.Text = "بدء التحضير 🧑‍🍳";
             this.btnStartCooking.UseVisualStyleBackColor = true;
+            this.btnStartCooking.Click += new System.EventHandler(this.btnStartCooking_Click_1);
             // 
             // btnShipOrder
             // 
@@ -67,6 +68,7 @@
             this.btnShipOrder.TabIndex = 2;
             this.btnShipOrder.Text = "بدء الشحن 🚚";
             this.btnShipOrder.UseVisualStyleBackColor = true;
+            this.btnShipOrder.Click += new System.EventHandler(this.btnShipOrder_Click_1);
             // 
             // button2
             // 
@@ -85,6 +87,7 @@
             this.btnCompleteOrder.TabIndex = 4;
             this.btnCompleteOrder.Text = "تم التسليم ✅";
             this.btnCompleteOrder.UseVisualStyleBackColor = true;
+            this.btnCompleteOrder.Click += new System.EventHandler(this.btnCompleteOrder_Click_1);
             // 
             // btnRefreshAdmin
             // 

@@ -161,5 +161,24 @@ namespace desingPatternsFinalProject
         {
             RefreshAdminGrid();
         }
+
+        private void btnStartCooking_Click_1(object sender, EventArgs e)
+        {
+            // يفترض الانتقال من PendingState أو NewOrderState إلى حالة الطبخ
+            ChangeOrderStatus<PendingState>();
+        }
+
+        private void btnCompleteOrder_Click_1(object sender, EventArgs e)
+        {
+            // يفترض الانتقال من OnTheWayState إلى حالة الإكمال
+            ChangeOrderStatus<OnTheWayState>();
+
+        }
+
+        private void btnShipOrder_Click_1(object sender, EventArgs e)
+        {
+            // يفترض الانتقال من CookingState إلى حالة الشحن
+            ChangeOrderStatus<CookingState>();
+        }
     }
 }
