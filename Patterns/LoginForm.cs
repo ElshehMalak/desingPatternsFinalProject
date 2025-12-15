@@ -52,13 +52,19 @@ namespace desingPatternsFinalProject.Patterns
                             break;
 
                         case "Driver":
-                            // افتحي فورم السائق
+                            // 🚨🚨 إضافة كود فتح واجهة الدليفري هنا 🚨🚨
+                            DeliveryManagementForm driverDeliveryForm = new DeliveryManagementForm();
+                            driverDeliveryForm.Show();
+                            // Optional:
                             MessageBox.Show("Welcome, Captain! 🚚");
-                            // DriverMainForm driver = new DriverMainForm();
-                            // driver.Show();
                             break;
+                             
 
                         case "Admin":
+                            // 🚨🚨 إضافة كود فتح واجهة الدليفري هنا أيضاً
+                            DeliveryManagementForm adminDeliveryForm = new DeliveryManagementForm();
+                            adminDeliveryForm.Show();
+                            // Optional:
                             MessageBox.Show("Welcome, Boss! 👔");
                             break;
 

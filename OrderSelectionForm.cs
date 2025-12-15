@@ -93,5 +93,17 @@ namespace desingPatternsFinalProject
         {
 
         }
+
+        private void btnTrackOrder_Click(object sender, EventArgs e)
+        {
+            // 1. إنشاء نموذج التتبع الجديد
+            OrderTrackingForm trackingForm = new OrderTrackingForm();
+
+            // 2. فتحه. (نستخدم Show() ليبقى نموذج العميل الرئيسي فعالاً)
+            trackingForm.Show();
+
+            // 💡 يمكن هنا إضافة رسالة تنبيه للعميل (اختياري)
+            MessageBox.Show("تم فتح شاشة التتبع. ستصلك الإشعارات فور تحديث الطلب من قبل الإدارة.", "بدء التتبع");
+        }
     }
 }

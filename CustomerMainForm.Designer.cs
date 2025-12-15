@@ -36,6 +36,7 @@
             this.btnStore = new System.Windows.Forms.Button();
             this.btnSupermarket = new System.Windows.Forms.Button();
             this.btnCourierService = new System.Windows.Forms.Button();
+            this.btnTestObserver = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnOpenStore
@@ -118,11 +119,22 @@
             this.btnCourierService.UseVisualStyleBackColor = true;
             this.btnCourierService.Click += new System.EventHandler(this.btnCourierService_Click);
             // 
+            // btnTestObserver
+            // 
+            this.btnTestObserver.Location = new System.Drawing.Point(442, 348);
+            this.btnTestObserver.Name = "btnTestObserver";
+            this.btnTestObserver.Size = new System.Drawing.Size(75, 23);
+            this.btnTestObserver.TabIndex = 15;
+            this.btnTestObserver.Text = "test";
+            this.btnTestObserver.UseVisualStyleBackColor = true;
+            this.btnTestObserver.Click += new System.EventHandler(this.btnTestObserver_Click);
+            // 
             // CustomerMainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(559, 408);
+            this.Controls.Add(this.btnTestObserver);
             this.Controls.Add(this.btnCourierService);
             this.Controls.Add(this.btnSupermarket);
             this.Controls.Add(this.btnStore);
@@ -148,6 +160,7 @@
         private System.Windows.Forms.Button btnStore;
         private System.Windows.Forms.Button btnSupermarket;
         private System.Windows.Forms.Button btnCourierService;
+        private System.Windows.Forms.Button btnTestObserver;
     }
 }
 

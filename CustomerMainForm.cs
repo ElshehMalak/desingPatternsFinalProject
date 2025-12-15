@@ -13,57 +13,114 @@ using static DeliverySystem.Patterns.Creational.Order;
 
 using desingPatternsFinalProject.Behavioral;
 using static desingPatternsFinalProject.Program;
-using StoreCategory =  DeliverySystem.Patterns.Creational.StoreCategory;
+using StoreCategory = DeliverySystem.Patterns.Creational.StoreCategory;
 using desingPatternsFinalProject.Patterns.Creational;
+using desingPatternsFinalProject.Patterns ; // مطلوب لدوال المدير المعلقة
 using desingPatternsFinalProject.Patterns;
 
 
 namespace desingPatternsFinalProject
 {
-    public partial class CustomerMainForm : Form
+    public partial class CustomerMainForm : Form, IOrderObserver
     {
+        // 🔑 1. إضافة متغيرات لتخزين الطلب النشط الذي يتم تتبعه (int)
+        private int _lastOrderId = 0;
+        private Order _activeOrder = null;
+
         public CustomerMainForm()
         {
             InitializeComponent();
+            // تم إزالة الربط الخاطئ من هنا.
+        }
+
+        // =========================================================
+        // تنفيذ واجهة IOrderObserver (التوقيع المصحح)
+        // =========================================================
+
+        public void Update(int updatedOrderId, string statusMessage)
+        {
+            // 🔑 التحقق من أن التحديث يخص الطلب الذي يراقبه هذا العميل
+            if (updatedOrderId != _lastOrderId || _lastOrderId == 0)
+            {
+                return;
+            }
+
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action<int, string>(Update), updatedOrderId, statusMessage);
+            }
+            else
+            {
+                MessageBox.Show(statusMessage, $"تحديث حالة طلبك رقم {_lastOrderId}");
+            }
+        }
+
+        private void CustomerMainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // 🚨 تصحيح: يجب استخدام Detach الذي يتطلب رقم الطلب
+            if (_lastOrderId != 0)
+            {
+                DeliveryManager.Instance.Detach(this, _lastOrderId);
+            }
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            lblWelcome.Text = "Welcome, " + UserSession.CurrentUserName + " 👋";  
+            // نفترض أن UserSession كائن موجود
+            // lblWelcome.Text = "Welcome, " + UserSession.CurrentUserName + " 👋";
         }
-     
+
         private void tabPage1_Click(object sender, EventArgs e)
         {
 
         }
-        /*
+
+        // =========================================================
+        // دالة إنشاء الطلب (تم تصحيح خطأ التحويل)
+        // =========================================================
+
         private void btnCreateOrder_Click(object sender, EventArgs e)
         {
-            
-            if (string.IsNullOrWhiteSpace(txtName.Text) || string.IsNullOrWhiteSpace(txtPhone.Text))
+            // ⚠️ لغرض التشغيل المؤقت بدون الواجهة، نفترض وجود بيانات:
+            Customer customer = new Customer { FullName = "Test Customer", Phone = "0000000000" };
+            Store selectedStore = DeliveryManager.Instance.StoresDB.FirstOrDefault();
+
+            if (selectedStore == null)
             {
-                MessageBox.Show("الرجاء إدخال اسمك ورقم الهاتف!", "بيانات ناقصة", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("لم يتم تهيئة أي متجر في النظام!", "خطأ", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-
-            if (lstStores.SelectedItem == null)
-            {
-                MessageBox.Show("الرجاء اختيار متجر من القائمة!", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            Customer customer = new Customer { Name = txtName.Text, Phone = txtPhone.Text };
-            Store selectedStore = (Store)lstStores.SelectedItem;
 
             using (var shopForm = new OrderSelectionForm(customer, selectedStore))
             {
-                //this.Hide();
-
                 if (shopForm.ShowDialog() == DialogResult.OK)
                 {
                     var finalOrder = shopForm.CreatedOrder;
-
                     DeliveryManager.Instance.AddOrder(finalOrder);
+
+                    // 🚨🚨 منطق المراقب: الفصل والربط برقم الطلب
+                    if (_activeOrder != null && _lastOrderId != 0)
+                    {
+                        DeliveryManager.Instance.Detach(this, _lastOrderId);
+                    }
+
+                    // 🔑 تصحيح خطأ CS0029: التحويل من string إلى int
+                    if (int.TryParse(finalOrder.OrderNumber, out int orderNum))
+                    {
+                        _lastOrderId = orderNum;
+                    }
+                    else
+                    {
+                        // إذا فشل التحويل (وهو أمر غير مرجح إذا كان OrderNumber تم إنشاؤه بشكل صحيح)، نستخدم قيمة افتراضية أو نخرج.
+                        MessageBox.Show("خطأ في قراءة رقم الطلب. لن يتم تتبع الطلب.", "تحذير", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
+                    _activeOrder = finalOrder;
+
+                    // 3. ربط المراقب بالطلب الجديد فقط
+                    DeliveryManager.Instance.Attach(this, _lastOrderId);
+                    // ----------------------------------------------------
 
                     MessageBox.Show(
                         $"تم استلام طلبك بنجاح! ✅\n" +
@@ -73,22 +130,26 @@ namespace desingPatternsFinalProject
                         "نجاح العملية");
                 }
 
-                this.Show(); 
+                this.Show();
             }
-            
-        }*/
+        }
+
+        // =========================================================
+        // دوال شاشة المدير (معلقة)
+        // =========================================================
+
         /*
         private void RefreshAdminGrid()
         {
             dgvOrders.DataSource = null;
             var allOrders = DeliveryManager.Instance.OrdersDB;
 
-            // Assuming `o` is a string, replace `o.StoreName` with `o` directly.
+            // Assuming 'o.OrderNumber' and 'o.StoreName' exist on the Order object
             dgvOrders.DataSource = allOrders.Select(o => new
             {
-                ID = o.OrderNumber,          // سميناه ID
-                Store = o.StoreName ,          // Use `o` directly since `o` is a string
-                Customer = o.OrderNumber,  // سميناه Customer
+                ID = o.OrderNumber,
+                Store = o.StoreName,
+                Customer = o.OrderNumber, 
                 Status = o.GetStatusString(),
                 Total = o.CalculateTotal()
             }).ToList();
@@ -100,7 +161,7 @@ namespace desingPatternsFinalProject
             dgvOrders.Columns["Status"].HeaderText = "حالة الطلب";
             dgvOrders.Columns["Total"].HeaderText = "الإجمالي";
         }
-        
+
         private void btnStartCooking_Click(object sender, EventArgs e)
         {
             ChangeOrderStatus<PendingState>();
@@ -113,24 +174,23 @@ namespace desingPatternsFinalProject
                 return;
             }
 
-            string orderNum = dgvOrders.CurrentRow.Cells[0].Value.ToString();
-
-            // Assuming `OrdersDB` contains objects of a class (not strings) that has a `CurrentState` property.  
-            var order = DeliveryManager.Instance.OrdersDB.FirstOrDefault(o => o.OrderNumber == orderNum);
+            // يجب أن يكون رقم الطلب في الخلية 0 من الصف الحالي
+            string orderNumString = dgvOrders.CurrentRow.Cells[0].Value.ToString();
+            
+            if (!int.TryParse(orderNumString, out int orderNum)) return; // التحقق من التحويل
+            
+            // البحث عن الطلب
+            var order = DeliveryManager.Instance.OrdersDB.FirstOrDefault(o => o.OrderNumber == orderNumString); 
 
             if (order != null)
             {
                 if (order.CurrentState is T)
                 {
-                    // ✅ نعم، هو في الحالة الصحيحة -> انتقل للحالة التالية  
                     order.NextState();
-
-                    // تحديث الجدول لنرى الحالة الجديدة  
                     RefreshAdminGrid();
                 }
                 else
                 {
-                    // ❌ لا، المدير يحاول تخطي مرحلة (مثلاً تسليم طلب لم يطبخ بعد)  
                     MessageBox.Show($"خطأ في التسلسل!\nحالة الطلب الحالية هي: {order.GetStatusString()} \nلا يمكن تنفيذ هذا الزر الآن.");
                 }
             }
@@ -151,12 +211,16 @@ namespace desingPatternsFinalProject
             RefreshAdminGrid();
         }
         */
+
+        // =========================================================
+        // دوال التصفح واختبار المراقب
+        // =========================================================
+
         private void btnRestaurants_Click(object sender, EventArgs e)
         {
-            RestaurantListForm foodForm = new RestaurantListForm();
-            foodForm.Show();
+            // RestaurantListForm foodForm = new RestaurantListForm(); 
+            // foodForm.Show();
         }
-        
 
         private void btnStore_Click(object sender, EventArgs e)
         {
@@ -175,10 +239,26 @@ namespace desingPatternsFinalProject
 
         private void btnLogOut_Click(object sender, EventArgs e)
         {
-            UserSession.ClearSession(); // نمسحوا الذاكرة
-            LoginForm login = new LoginForm(); // نرجعوا للدخول
-            login.Show();
+            // UserSession.ClearSession(); 
+            // LoginForm login = new LoginForm(); 
+            // login.Show();
             this.Close();
+        }
+
+        private void btnTestObserver_Click(object sender, EventArgs e)
+        {
+            if (_lastOrderId == 0)
+            {
+                MessageBox.Show("الرجاء إنشاء طلب أولاً ليتم تتبعه!", "خطأ", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            DeliveryManager.Instance.UpdateOrderStatus(
+                orderId: _lastOrderId,
+                newStatus: $"تم استلام إشعار تجريبي: حالة طلبك {_lastOrderId} هي الآن قيد التسليم! 🛵"
+            );
+
+            MessageBox.Show($"تم إطلاق إشعار التحديث للطلب رقم {_lastOrderId}.", "تأكيد الإطلاق", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }

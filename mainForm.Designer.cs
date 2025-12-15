@@ -33,6 +33,7 @@
             this.btn1 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
+            this.btnTestObserver = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // titleText
@@ -86,11 +87,22 @@
             this.button4.Text = "button4";
             this.button4.UseVisualStyleBackColor = true;
             // 
+            // btnTestObserver
+            // 
+            this.btnTestObserver.Location = new System.Drawing.Point(478, 278);
+            this.btnTestObserver.Name = "btnTestObserver";
+            this.btnTestObserver.Size = new System.Drawing.Size(75, 23);
+            this.btnTestObserver.TabIndex = 5;
+            this.btnTestObserver.Text = "test";
+            this.btnTestObserver.UseVisualStyleBackColor = true;
+            this.btnTestObserver.Click += new System.EventHandler(this.btnTestObserver_Click_1);
+            // 
             // mainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(599, 342);
+            this.Controls.Add(this.btnTestObserver);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.btn1);
@@ -110,5 +122,6 @@
         private System.Windows.Forms.Button btn1;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.Button btnTestObserver;
     }
 }

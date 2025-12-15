@@ -42,6 +42,7 @@
             this.btnAdd = new System.Windows.Forms.Button();
             this.btnRemove = new System.Windows.Forms.Button();
             this.Menu = new System.Windows.Forms.ListBox();
+            this.btnTrackOrder = new System.Windows.Forms.Button();
             this.groupbShoppingCart.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvCart)).BeginInit();
             this.groupBox2.SuspendLayout();
@@ -187,11 +188,22 @@
             this.Menu.TabIndex = 0;
             this.Menu.SelectedIndexChanged += new System.EventHandler(this.lstMenu_SelectedIndexChanged);
             // 
+            // btnTrackOrder
+            // 
+            this.btnTrackOrder.Location = new System.Drawing.Point(592, 393);
+            this.btnTrackOrder.Name = "btnTrackOrder";
+            this.btnTrackOrder.Size = new System.Drawing.Size(236, 34);
+            this.btnTrackOrder.TabIndex = 2;
+            this.btnTrackOrder.Text = "تتبع حالة الطلب 📦";
+            this.btnTrackOrder.UseVisualStyleBackColor = true;
+            this.btnTrackOrder.Click += new System.EventHandler(this.btnTrackOrder_Click);
+            // 
             // OrderSelectionForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(862, 442);
+            this.Controls.Add(this.btnTrackOrder);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupbShoppingCart);
             this.Name = "OrderSelectionForm";
@@ -223,5 +235,6 @@
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button btnSubmit;
         private System.Windows.Forms.Label lblTotal;
+        private System.Windows.Forms.Button btnTrackOrder;
     }
 }

@@ -8,108 +8,111 @@ using System.Threading.Tasks;
 
 namespace desingPatternsFinalProject.Patterns.Creational
 {
-        public class DatabaseManager
+    public class DatabaseManager
+    {
+        private static DatabaseManager _instance;
+
+        // 🚨🚨 2. نص الاتصال المُعدّل ليعمل على جهازك 🚨🚨
+        // تم استبدال Data Source=. بـ Data Source=DESKTOP-E2HTT0B\SQLEXPRESS
+        // ✅ النص الجديد (لفرض استخدام TCP/IP):
+        // في ملف DatabaseManager.cs
+        // في ملف DatabaseManager.cs
+        // استخدمنا localhost (عنوان الجهاز المحلي) مع تحديد المنفذ 1433 لفرض TCP/IP
+        public static string ConnectionString = @"Data Source=127.0.0.1,1433;Initial Catalog=DeliveryProDB;Integrated Security=True";
+        // أو:
+        // public static string ConnectionString = @"Data Source=localhost,1433;Initial Catalog=DeliveryProDB;Integrated Security=True"; 
+        private SqlConnection _connection;
+
+        // 3. الكونستركتور (Private) - عشان نمنع أي حد يقول new DatabaseManager()
+        private DatabaseManager()
         {
-            private static DatabaseManager _instance;
+            _connection = new SqlConnection(ConnectionString);
+        }
 
-            // 2. نص الاتصال (هذا عنوان السيرفر متاعك)
-            // ملاحظة: غيري ServerName لاسم جهازك
-            public static string ConnectionString = @"Data Source=.;Initial Catalog=DeliveryProDB;Integrated Security=True";
-
-            // كائن الاتصال
-            private SqlConnection _connection;
-
-            // 3. الكونستركتور (Private) - عشان نمنع أي حد يقول new DatabaseManager()
-            private DatabaseManager()
+        // 4. الدالة اللي ترجع النسخة الوحيدة (Singleton Pattern)
+        public static DatabaseManager GetInstance()
+        {
+            if (_instance == null)
             {
-                _connection = new SqlConnection(ConnectionString);
+                _instance = new DatabaseManager();
             }
+            return _instance;
+        }
 
-            // 4. الدالة اللي ترجع النسخة الوحيدة (Singleton Pattern)
-            public static DatabaseManager GetInstance()
+        // دالة ترجع الاتصال مفتوح (يستعملوها باقي الكلاسات)
+        public SqlConnection GetConnection()
+        {
+            if (_connection.State == ConnectionState.Closed)
             {
-                if (_instance == null)
-                {
-                    _instance = new DatabaseManager();
-                }
-                return _instance;
+                _connection.Open();
             }
+            return _connection;
+        }
 
-            // دالة ترجع الاتصال مفتوح (يستعملوها باقي الكلاسات)
-            public SqlConnection GetConnection()
+        // دالة لإغلاق الاتصال (النظافة مهمة)
+        public void CloseConnection()
+        {
+            if (_connection.State == ConnectionState.Open)
             {
-                if (_connection.State == ConnectionState.Closed)
-                {
-                    _connection.Open();
-                }
-                return _connection;
+                _connection.Close();
             }
+        }
 
-            // دالة لإغلاق الاتصال (النظافة مهمة)
-            public void CloseConnection()
+        // دالة تنفذ أمر (Insert, Update, Delete) وترجع هل نجح ولا لا
+        public void ExecuteQuery(string query)
+        {
+            try
             {
-                if (_connection.State == ConnectionState.Open)
-                {
-                    _connection.Close();
-                }
+                GetConnection();
+                SqlCommand cmd = new SqlCommand(query, _connection);
+                cmd.ExecuteNonQuery();
             }
-
-            // دالة تنفذ أمر (Insert, Update, Delete) وترجع هل نجح ولا لا
-            public void ExecuteQuery(string query)
+            catch (Exception ex)
             {
-                try
-                {
-                    GetConnection();
-                    SqlCommand cmd = new SqlCommand(query, _connection);
-                    cmd.ExecuteNonQuery();
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception("خطأ في قاعدة البيانات: " + ex.Message);
-                }
-                finally
-                {
-                    CloseConnection();
-                }
+                throw new Exception("خطأ في قاعدة البيانات: " + ex.Message);
             }
-
-            // دالة تنفذ استعلام وترجع قيمة واحدة (تستخدم للبحث أو Login)
-            public object ExecuteScalar(string query)
+            finally
             {
-                object result = null;
-                try
-                {
-                    GetConnection();
-                    SqlCommand cmd = new SqlCommand(query, _connection);
-                    result = cmd.ExecuteScalar();
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception("خطأ في جلب البيانات: " + ex.Message);
-                }
-                finally
-                {
-                    CloseConnection();
-                }
-                return result;
+                CloseConnection();
             }
+        }
 
-            // دالة التحقق من تسجيل الدخول (اللي طلبناها بدري)
-            // ترجع UserType لو البيانات صح، وترجع null لو غلط
-            public string CheckUserType(string email, string password)
+        // دالة تنفذ استعلام وترجع قيمة واحدة (تستخدم للبحث أو Login)
+        public object ExecuteScalar(string query)
+        {
+            object result = null;
+            try
             {
-                string type = null;
-                string query = $"SELECT UserType FROM Users WHERE Email = '{email}' AND PasswordHash = '{password}'";
-
-                // استخدمنا الدالة اللي فوق عشان نختصر الكود
-                object result = ExecuteScalar(query);
-
-                if (result != null)
-                {
-                    type = result.ToString();
-                }
-                return type;
+                GetConnection();
+                SqlCommand cmd = new SqlCommand(query, _connection);
+                result = cmd.ExecuteScalar();
             }
+            catch (Exception ex)
+            {
+                throw new Exception("خطأ في جلب البيانات: " + ex.Message);
+            }
+            finally
+            {
+                CloseConnection();
+            }
+            return result;
+        }
+
+        // دالة التحقق من تسجيل الدخول 
+        public string CheckUserType(string email, string password)
+        {
+            string type = null;
+            string query = $"SELECT UserType FROM Users WHERE Email = '{email}' AND PasswordHash = '{password}'";
+
+            object result = ExecuteScalar(query);
+
+            if (result != null)
+            {
+                type = result.ToString();
+            }
+            return type;
+        }
+
         public bool IsEmailExists(string email)
         {
             string query = "SELECT COUNT(*) FROM Users WHERE Email = @Email";
@@ -122,19 +125,18 @@ namespace desingPatternsFinalProject.Patterns.Creational
                 try
                 {
                     conn.Open();
-                    int count = (int)cmd.ExecuteScalar(); // ترجع عدد مرات ظهور الايميل
+                    int count = (int)cmd.ExecuteScalar();
 
                     if (count > 0)
-                        return true; // موجود
+                        return true;
                     else
-                        return false; // مش موجود
+                        return false;
                 }
                 catch (Exception)
                 {
-                    return false; // لو صار خطأ نعتبره مش موجود عشان ما يوقفش البرنامج (أو نعالجوه)
+                    return false;
                 }
             }
         }
     }
- 
 }

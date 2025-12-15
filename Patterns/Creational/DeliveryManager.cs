@@ -1,24 +1,32 @@
-﻿using System;
+﻿using desingPatternsFinalProject.Patterns;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static desingPatternsFinalProject.Program;
-
+using desingPatternsFinalProject.Behavioral;
+using DeliverySystem.Patterns.Creational;
+// 🚨 يجب إضافة مساحة الاسم الخاصة بالـ State Pattern هنا لتجنب خطأ NextState()
+using desingPatternsFinalProject.Patterns;
+// 🔑 يجب التأكد من مساحة اسم OrderFactory، أفترض أنها في:
 using DeliverySystem.Patterns.Creational;
 
-namespace DeliverySystem.Patterns.Creational
+
+namespace desingPatternsFinalProject.Patterns.Creational
 {
     public sealed class DeliveryManager
     {
         private static DeliveryManager _instance = null;
-        public List<Order> OrdersDB { get; private set; }
-        public List<Store> StoresDB { get; private set; }
+
+        public List<Order> OrdersDB { get; private set; } = new List<Order>();
+        public List<Store> StoresDB { get; private set; } = new List<Store>();
+        private Dictionary<int, List<IOrderObserver>> _orderObservers;
+
+
         private DeliveryManager()
         {
             OrdersDB = new List<Order>();
             StoresDB = new List<Store>();
+            _orderObservers = new Dictionary<int, List<IOrderObserver>>();
 
+            // تهيئة بيانات المتاجر
             var burgerKing = new Store("Burger King", StoreCategory.FoodAndCoffee);
             burgerKing.Menu.Add(new Product { Name = "Whopper Meal", Price = 25 });
             burgerKing.Menu.Add(new Product { Name = "Cheese Burger", Price = 15 });
@@ -30,6 +38,9 @@ namespace DeliverySystem.Patterns.Creational
             panda.Menu.Add(new Product { Name = "Bread", Price = 2 });
             panda.Menu.Add(new Product { Name = "Chocolate", Price = 5 });
             StoresDB.Add(panda);
+
+            // 🔑 الاستدعاء يحدث هنا:
+            InitializeDummyOrders();
         }
 
         public static DeliveryManager Instance
@@ -44,19 +55,90 @@ namespace DeliverySystem.Patterns.Creational
             }
         }
 
+        // =========================================================
+        // دالة إضافة البيانات التجريبية (تم تصحيح مشكلة عدم ظهور الطلبات)
+        // =========================================================
+        private void InitializeDummyOrders()
+        {
+            // ❌ تم إزالة: if (OrdersDB.Count > 0) return;
+            // 🔑 التصحيح: مسح القائمة لضمان إعادة تعبئتها في كل مرة
+            OrdersDB.Clear();
+
+            Customer customer1 = new Customer { FullName = "أحمد محمد", Phone = "091xxxxxxx" };
+            Customer customer2 = new Customer { FullName = "فاطمة علي", Phone = "092xxxxxxx" };
+
+            // الطلب رقم 1: حالة قيد التحضير (Cooking)
+            Order order1 = OrderFactory.CreateOrder(StoreCategory.FoodAndCoffee, customer1, "مطعم الوجبة السريعة");
+            order1.AddItem(new Product { Name = "بيتزا", Price = 15.0m }, 1);
+            order1.AddItem(new Product { Name = "مشروب غازي", Price = 2.0m }, 2);
+            order1.OrderNumber = "1001";
+
+            order1.NextState();
+            order1.NextState();
+
+            OrdersDB.Add(order1);
+
+
+            // الطلب رقم 2: حالة في الطريق (OnTheWay)
+            Order order2 = OrderFactory.CreateOrder(StoreCategory.Supermarket, customer2, "سوبر ماركت الإسراء");
+            order2.AddItem(new Product { Name = "خبز", Price = 1.0m }, 3);
+            order2.OrderNumber = "1002";
+
+            order2.NextState();
+            order2.NextState();
+            order2.NextState();
+
+            OrdersDB.Add(order2);
+        }
+
+        // =========================================================
+        // دوال Observer Pattern
+        // =========================================================
+
         public void AddOrder(Order orderDetails)
         {
             OrdersDB.Add(orderDetails);
         }
-        public List<Order> GetAllOrders()
+
+        public void Attach(IOrderObserver observer, int orderId)
         {
-            return OrdersDB;
+            if (!_orderObservers.ContainsKey(orderId))
+            {
+                _orderObservers[orderId] = new List<IOrderObserver>();
+            }
+
+            if (!_orderObservers[orderId].Contains(observer))
+            {
+                _orderObservers[orderId].Add(observer);
+            }
         }
-        public List<Store> SearchStores(StoreCategory category, string query)
+
+        public void Detach(IOrderObserver observer, int orderId)
         {
-            return StoresDB
-                .Where(s => s.Category == category && s.Name.ToLower().Contains(query.ToLower()))
-                .ToList();
+            if (_orderObservers.ContainsKey(orderId))
+            {
+                _orderObservers[orderId].Remove(observer);
+                if (_orderObservers[orderId].Count == 0)
+                {
+                    _orderObservers.Remove(orderId);
+                }
+            }
+        }
+
+        public void NotifyObservers(int orderId, string message)
+        {
+            if (_orderObservers.ContainsKey(orderId))
+            {
+                foreach (var observer in _orderObservers[orderId].ToList())
+                {
+                    observer.Update(orderId, message);
+                }
+            }
+        }
+
+        public void UpdateOrderStatus(int orderId, string newStatus)
+        {
+            NotifyObservers(orderId, newStatus);
         }
     }
 }
