@@ -218,8 +218,8 @@ namespace desingPatternsFinalProject
 
         private void btnRestaurants_Click(object sender, EventArgs e)
         {
-            // RestaurantListForm foodForm = new RestaurantListForm(); 
-            // foodForm.Show();
+              RestaurantListForm foodForm = new RestaurantListForm(); 
+             foodForm.Show();
         }
 
         private void btnStore_Click(object sender, EventArgs e)

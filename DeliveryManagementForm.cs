@@ -32,22 +32,36 @@ namespace desingPatternsFinalProject
             dgvOrders.DataSource = null;
             var allOrders = DeliveryManager.Instance.OrdersDB;
 
+            //🔑 1.تعديل الـ LINQ لإضافة خاصيتي DeliveryType و DeliveryEstimate
             dgvOrders.DataSource = allOrders.Select(o => new
             {
                 ID = o.OrderNumber,
                 Store = o.StoreName,
-                // 💡 نستخدم خاصية Name للعميل (أو رقم الطلب كما كان في كودك الأصلي، لكن Name أفضل)
-                Customer = o.Customer?.FullName ?? o.OrderNumber.ToString(), 
+                Customer = o.Customer?.FullName ?? o.OrderNumber.ToString(),
+                // 💡 إضافة خاصية نوع التوصيل
+                DeliveryType = o.GetDeliveryType(),
+                // 💡 إضافة خاصية الوقت المقدر
+                Estimate = o.GetDeliveryEstimate(),
                 Status = o.GetStatusString(),
                 Total = o.CalculateTotal()
             }).ToList();
 
-            // تحديث رؤوس الأعمدة
+            // 🔑 2. تحديث رؤوس الأعمدة
             if (dgvOrders.Columns["ID"] != null) dgvOrders.Columns["ID"].HeaderText = "رقم الطلب";
             if (dgvOrders.Columns["Store"] != null) dgvOrders.Columns["Store"].HeaderText = "المتجر";
             if (dgvOrders.Columns["Customer"] != null) dgvOrders.Columns["Customer"].HeaderText = "العميل";
+            // 🔑 إضافة رأس العمود الجديد لنوع التوصيل
+            if (dgvOrders.Columns["DeliveryType"] != null) dgvOrders.Columns["DeliveryType"].HeaderText = "نوع التوصيل";
+            // 🔑 إضافة رأس العمود الجديد للوقت المقدر
+            if (dgvOrders.Columns["Estimate"] != null) dgvOrders.Columns["Estimate"].HeaderText = "وقت مقدر";
             if (dgvOrders.Columns["Status"] != null) dgvOrders.Columns["Status"].HeaderText = "حالة الطلب";
             if (dgvOrders.Columns["Total"] != null) dgvOrders.Columns["Total"].HeaderText = "الإجمالي";
+
+            // 💡 ملاحظة: التأكد من أن عمود الإجمالي (Total) يعرض التكلفة النهائية التي تحسبها الاستراتيجية
+            if (dgvOrders.Columns["Total"] != null)
+            {
+                dgvOrders.Columns["Total"].DefaultCellStyle.Format = "C"; // لعرض العملة
+            }
         }
 
 
@@ -83,14 +97,17 @@ namespace desingPatternsFinalProject
                     // ✅ 1. انتقال الطلب إلى الحالة التالية (State Pattern)
                     order.NextState();
 
-                    // 🚨🚨 2. الخطوة الحاسمة: إطلاق إشعار المراقب (Observer Notify) 🚨🚨
-                    string newStatus = order.GetStatusString(); 
-                    string notificationMessage = $"تحديث: حالة طلبك رقم {orderId} هي الآن: {newStatus}";
-                    
+                    // 🔑 إضافة معلومات التوصيل الناتجة عن Strategy إلى رسالة الإشعار
+                    string newStatus = order.GetStatusString();
+                    string deliveryType = order.GetDeliveryType();
+                    string deliveryEstimate = order.GetDeliveryEstimate();
+
+                    string notificationMessage = $"تحديث: حالة طلبك رقم {orderId} هي الآن: {newStatus}. \nنوع التوصيل: {deliveryType}. الوقت المقدر: {deliveryEstimate}";
+
                     // نرسل الإشعار لجميع المراقبين المربوطين (مثل OrderTrackingForm)
                     DeliveryManager.Instance.UpdateOrderStatus(
-                        orderId: orderId, 
-                        newStatus: notificationMessage 
+                        orderId: orderId,
+                        newStatus: notificationMessage
                     );
                     // ----------------------------------------------------
 

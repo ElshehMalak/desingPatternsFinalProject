@@ -82,6 +82,10 @@
     <Compile Include="Patterns\behavioral\IOrderObserver.cs" />
     <Compile Include="Patterns\behavioral\ISubject.cs" />
     <Compile Include="Patterns\behavioral\OrderStatePattern.cs" />
+    <Compile Include="Patterns\behavioral\Strategy\ExpressDelivery.cs" />
+    <Compile Include="Patterns\behavioral\Strategy\IDeliveryStrategy.cs" />
+    <Compile Include="Patterns\behavioral\Strategy\NormalDelivery.cs" />
+    <Compile Include="Patterns\behavioral\Strategy\PickupDelivery.cs" />
     <Compile Include="Patterns\Creational\DatabaseManager.cs" />
     <Compile Include="Patterns\Creational\DeliveryManager.cs" />
     <Compile Include="Patterns\Creational\Factory.cs" />

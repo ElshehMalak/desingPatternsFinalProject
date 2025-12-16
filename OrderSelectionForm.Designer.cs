@@ -29,6 +29,11 @@
         private void InitializeComponent()
         {
             this.groupbShoppingCart = new System.Windows.Forms.GroupBox();
+            this.lblDeliveryCost = new System.Windows.Forms.Label();
+            this.groupBoxDelivery = new System.Windows.Forms.GroupBox();
+            this.rdbExpressDelivery = new System.Windows.Forms.RadioButton();
+            this.rdbPickupDelivery = new System.Windows.Forms.RadioButton();
+            this.rdbNormalDelivery = new System.Windows.Forms.RadioButton();
             this.btnSubmit = new System.Windows.Forms.Button();
             this.lblTotal = new System.Windows.Forms.Label();
             this.dgvCart = new System.Windows.Forms.DataGridView();
@@ -44,6 +49,7 @@
             this.Menu = new System.Windows.Forms.ListBox();
             this.btnTrackOrder = new System.Windows.Forms.Button();
             this.groupbShoppingCart.SuspendLayout();
+            this.groupBoxDelivery.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvCart)).BeginInit();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numQty)).BeginInit();
@@ -51,6 +57,8 @@
             // 
             // groupbShoppingCart
             // 
+            this.groupbShoppingCart.Controls.Add(this.lblDeliveryCost);
+            this.groupbShoppingCart.Controls.Add(this.groupBoxDelivery);
             this.groupbShoppingCart.Controls.Add(this.btnSubmit);
             this.groupbShoppingCart.Controls.Add(this.lblTotal);
             this.groupbShoppingCart.Controls.Add(this.dgvCart);
@@ -63,11 +71,67 @@
             this.groupbShoppingCart.Text = "Shopping Cart";
             this.groupbShoppingCart.Enter += new System.EventHandler(this.groupbShoppingCart_Enter);
             // 
+            // lblDeliveryCost
+            // 
+            this.lblDeliveryCost.AutoSize = true;
+            this.lblDeliveryCost.Location = new System.Drawing.Point(18, 211);
+            this.lblDeliveryCost.Name = "lblDeliveryCost";
+            this.lblDeliveryCost.Size = new System.Drawing.Size(123, 21);
+            this.lblDeliveryCost.TabIndex = 5;
+            this.lblDeliveryCost.Text = "Delivery Cost";
+            // 
+            // groupBoxDelivery
+            // 
+            this.groupBoxDelivery.Controls.Add(this.rdbExpressDelivery);
+            this.groupBoxDelivery.Controls.Add(this.rdbPickupDelivery);
+            this.groupBoxDelivery.Controls.Add(this.rdbNormalDelivery);
+            this.groupBoxDelivery.Location = new System.Drawing.Point(244, 265);
+            this.groupBoxDelivery.Name = "groupBoxDelivery";
+            this.groupBoxDelivery.Size = new System.Drawing.Size(168, 104);
+            this.groupBoxDelivery.TabIndex = 4;
+            this.groupBoxDelivery.TabStop = false;
+            this.groupBoxDelivery.Text = "Delivery Option";
+            // 
+            // rdbExpressDelivery
+            // 
+            this.rdbExpressDelivery.AutoSize = true;
+            this.rdbExpressDelivery.Location = new System.Drawing.Point(6, 48);
+            this.rdbExpressDelivery.Name = "rdbExpressDelivery";
+            this.rdbExpressDelivery.Size = new System.Drawing.Size(97, 25);
+            this.rdbExpressDelivery.TabIndex = 2;
+            this.rdbExpressDelivery.Text = "Express";
+            this.rdbExpressDelivery.UseVisualStyleBackColor = true;
+            this.rdbExpressDelivery.CheckedChanged += new System.EventHandler(this.rdbNormalDelivery_CheckedChanged);
+            // 
+            // rdbPickupDelivery
+            // 
+            this.rdbPickupDelivery.AutoSize = true;
+            this.rdbPickupDelivery.Location = new System.Drawing.Point(6, 73);
+            this.rdbPickupDelivery.Name = "rdbPickupDelivery";
+            this.rdbPickupDelivery.Size = new System.Drawing.Size(90, 25);
+            this.rdbPickupDelivery.TabIndex = 1;
+            this.rdbPickupDelivery.Text = "PickUp";
+            this.rdbPickupDelivery.UseVisualStyleBackColor = true;
+            this.rdbPickupDelivery.CheckedChanged += new System.EventHandler(this.rdbNormalDelivery_CheckedChanged);
+            // 
+            // rdbNormalDelivery
+            // 
+            this.rdbNormalDelivery.AutoSize = true;
+            this.rdbNormalDelivery.Checked = true;
+            this.rdbNormalDelivery.Location = new System.Drawing.Point(6, 27);
+            this.rdbNormalDelivery.Name = "rdbNormalDelivery";
+            this.rdbNormalDelivery.Size = new System.Drawing.Size(93, 25);
+            this.rdbNormalDelivery.TabIndex = 0;
+            this.rdbNormalDelivery.TabStop = true;
+            this.rdbNormalDelivery.Text = "Normal";
+            this.rdbNormalDelivery.UseVisualStyleBackColor = true;
+            this.rdbNormalDelivery.CheckedChanged += new System.EventHandler(this.rdbNormalDelivery_CheckedChanged);
+            // 
             // btnSubmit
             // 
-            this.btnSubmit.Location = new System.Drawing.Point(92, 294);
+            this.btnSubmit.Location = new System.Drawing.Point(22, 284);
             this.btnSubmit.Name = "btnSubmit";
-            this.btnSubmit.Size = new System.Drawing.Size(160, 44);
+            this.btnSubmit.Size = new System.Drawing.Size(134, 44);
             this.btnSubmit.TabIndex = 3;
             this.btnSubmit.Text = "Submit";
             this.btnSubmit.UseVisualStyleBackColor = true;
@@ -76,7 +140,7 @@
             // lblTotal
             // 
             this.lblTotal.AutoSize = true;
-            this.lblTotal.Location = new System.Drawing.Point(57, 253);
+            this.lblTotal.Location = new System.Drawing.Point(18, 180);
             this.lblTotal.Name = "lblTotal";
             this.lblTotal.Size = new System.Drawing.Size(53, 21);
             this.lblTotal.TabIndex = 2;
@@ -89,11 +153,11 @@
             this.Product,
             this.Price,
             this.Quantity});
-            this.dgvCart.Location = new System.Drawing.Point(6, 32);
+            this.dgvCart.Location = new System.Drawing.Point(7, 23);
             this.dgvCart.Name = "dgvCart";
             this.dgvCart.RowHeadersWidth = 51;
             this.dgvCart.RowTemplate.Height = 26;
-            this.dgvCart.Size = new System.Drawing.Size(427, 187);
+            this.dgvCart.Size = new System.Drawing.Size(427, 144);
             this.dgvCart.TabIndex = 1;
             // 
             // Product
@@ -135,7 +199,7 @@
             // 
             // numQty
             // 
-            this.numQty.Location = new System.Drawing.Point(19, 381);
+            this.numQty.Location = new System.Drawing.Point(129, 313);
             this.numQty.Name = "numQty";
             this.numQty.Size = new System.Drawing.Size(93, 28);
             this.numQty.TabIndex = 5;
@@ -158,7 +222,7 @@
             // 
             // btnAdd
             // 
-            this.btnAdd.Location = new System.Drawing.Point(136, 371);
+            this.btnAdd.Location = new System.Drawing.Point(224, 256);
             this.btnAdd.Name = "btnAdd";
             this.btnAdd.Size = new System.Drawing.Size(105, 44);
             this.btnAdd.TabIndex = 2;
@@ -168,7 +232,7 @@
             // 
             // btnRemove
             // 
-            this.btnRemove.Location = new System.Drawing.Point(258, 371);
+            this.btnRemove.Location = new System.Drawing.Point(63, 254);
             this.btnRemove.Name = "btnRemove";
             this.btnRemove.Size = new System.Drawing.Size(105, 44);
             this.btnRemove.TabIndex = 1;
@@ -184,7 +248,7 @@
             this.Menu.Location = new System.Drawing.Point(19, 81);
             this.Menu.Name = "Menu";
             this.Menu.ScrollAlwaysVisible = true;
-            this.Menu.Size = new System.Drawing.Size(361, 256);
+            this.Menu.Size = new System.Drawing.Size(344, 151);
             this.Menu.TabIndex = 0;
             this.Menu.SelectedIndexChanged += new System.EventHandler(this.lstMenu_SelectedIndexChanged);
             // 
@@ -211,6 +275,8 @@
             this.Load += new System.EventHandler(this.OrderSelectionForm_Load);
             this.groupbShoppingCart.ResumeLayout(false);
             this.groupbShoppingCart.PerformLayout();
+            this.groupBoxDelivery.ResumeLayout(false);
+            this.groupBoxDelivery.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvCart)).EndInit();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
@@ -236,5 +302,10 @@
         private System.Windows.Forms.Button btnSubmit;
         private System.Windows.Forms.Label lblTotal;
         private System.Windows.Forms.Button btnTrackOrder;
+        private System.Windows.Forms.GroupBox groupBoxDelivery;
+        private System.Windows.Forms.RadioButton rdbExpressDelivery;
+        private System.Windows.Forms.RadioButton rdbPickupDelivery;
+        private System.Windows.Forms.RadioButton rdbNormalDelivery;
+        private System.Windows.Forms.Label lblDeliveryCost;
     }
 }

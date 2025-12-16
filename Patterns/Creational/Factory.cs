@@ -7,7 +7,7 @@ using  desingPatternsFinalProject.Behavioral;
 using DeliverySystem.Patterns.Creational;
 using desingPatternsFinalProject.Patterns.Creational;
 
-
+using desingPatternsFinalProject.Behavioral.Strategy;
 namespace DeliverySystem.Patterns.Creational
 {
         public enum StoreCategory
@@ -60,19 +60,64 @@ namespace DeliverySystem.Patterns.Creational
             public IOrderState CurrentState { get; set; }
             public DateTime OrderDate { get; set; }
 
-
-            public Order(Customer customer, StoreCategory category, string storeName)
+        // =========================================================
+        // 🔑 إضافة نمط Strategy (الـ Context)
+        // =========================================================
+        public IDeliveryStrategy DeliveryStrategy { get; private set; }
+        public Order(Customer customer, StoreCategory category, string storeName)
             {
-                Customer = customer;
+               this.Customer = customer as User;
                 Category = category;
                 StoreName = storeName;
                 Items = new List<OrderItem>();
                 OrderDate = DateTime.Now;
                 OrderNumber = GenerateOrderNumber();
-                CurrentState = new PendingState();
+            // 💡 تعيين استراتيجية توصيل افتراضية (Normal) عند إنشاء الطلب
+            SetDeliveryStrategy(new NormalDelivery());
+            CurrentState = new PendingState();
             }
+        // =========================================================
+        // دوال Strategy
+        // =========================================================
 
-            private string GenerateOrderNumber()
+        public void SetDeliveryStrategy(IDeliveryStrategy strategy)
+        {
+            DeliveryStrategy = strategy;
+        }
+
+        // 💡 الدالة المساعدة لحساب إجمالي قيمة العناصر فقط
+        public decimal CalculateItemsTotal()
+        {
+            return Items.Sum(i => i.GetTotal());
+        }
+        // 🔑 تعديل دالة CalculateTotal لاستخدام الاستراتيجية
+        public decimal CalculateTotal()
+        {
+            decimal itemsTotal = CalculateItemsTotal();
+            decimal deliveryCost = 0.0m;
+
+            // استخدام الاستراتيجية لحساب التكلفة بناءً على النوع المختار
+            if (DeliveryStrategy != null)
+            {
+                deliveryCost = DeliveryStrategy.CalculateDeliveryCost(this);
+            }
+            // إذا كان null، سيتم استخدام 0.0m لتكلفة التوصيل (نحن وضعنا Default في Constructor)
+
+            return itemsTotal + deliveryCost;
+        }
+
+        // دالة لعرض نوع التوصيل
+        public string GetDeliveryType()
+        {
+            return DeliveryStrategy?.DeliveryType ?? "غير محدد";
+        }
+
+        // دالة لعرض الوقت المقدر للتوصيل
+        public string GetDeliveryEstimate()
+        {
+            return DeliveryStrategy?.GetDeliveryTimeEstimate(this) ?? "لم يتم تحديد وقت مقدر.";
+        }
+        private string GenerateOrderNumber()
             {
                 // to simplify search in the database , we use category prefix + timestamp
 
@@ -83,17 +128,15 @@ namespace DeliverySystem.Patterns.Creational
             {
                 Items.Add(new OrderItem(product, quantity));
             }
-            public decimal CalculateTotal()
-            {
-                return Items.Sum(i => i.GetTotal());
-            }
+             
             public abstract string ProcessOrder();
 
-            public override string ToString()
-            {
-                return $"#{OrderNumber} | {Category} | {CalculateTotal():C}";
-            }
-            public void NextState()
+        public override string ToString()
+        {
+            // 🔑 إضافة استدعاء GetDeliveryType()
+            return $"#{OrderNumber} | {Category} | {GetDeliveryType()} | {CalculateTotal():C}";
+        }
+        public void NextState()
             {
                 CurrentState.Proceed(this);
             }
