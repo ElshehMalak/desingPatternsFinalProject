@@ -124,6 +124,9 @@
     <EmbeddedResource Include="OrderSelectionForm.resx">
       <DependentUpon>OrderSelectionForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="OrderTrackingForm.resx">
+      <DependentUpon>OrderTrackingForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Patterns\LoginForm.resx">
       <DependentUpon>LoginForm.cs</DependentUpon>
     </EmbeddedResource>

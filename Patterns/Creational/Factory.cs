@@ -136,6 +136,12 @@ namespace DeliverySystem.Patterns.Creational
             // 🔑 إضافة استدعاء GetDeliveryType()
             return $"#{OrderNumber} | {Category} | {GetDeliveryType()} | {CalculateTotal():C}";
         }
+
+        // 2. 🔑 الدالة المفقودة: لتعيين الحالة الأولية أو تغييرها
+        public void SetState(IOrderState newState)
+        {
+            this.CurrentState = newState;
+        }
         public void NextState()
             {
                 CurrentState.Proceed(this);

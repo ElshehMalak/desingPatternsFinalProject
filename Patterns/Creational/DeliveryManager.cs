@@ -14,7 +14,8 @@ namespace desingPatternsFinalProject.Patterns.Creational
     public sealed class DeliveryManager
     {
         private static DeliveryManager _instance = null;
-
+        //🔑 أضيفي هذا العداد لضمان فرادة وأمان رقم الطلب
+    private int _nextOrderNumber = 1003;
         public List<Order> OrdersDB { get; private set; } = new List<Order>();
         public List<Store> StoresDB { get; private set; } = new List<Store>();
         private Dictionary<int, List<IOrderObserver>> _orderObservers;
@@ -97,7 +98,26 @@ namespace desingPatternsFinalProject.Patterns.Creational
 
         public void AddOrder(Order orderDetails)
         {
+            // 1. توليد رقم طلب فريد وزيادة العداد
+            // سنقوم بالتحويل إلى string لأن خاصية OrderNumber لديك هي string
+            string newOrderNum = _nextOrderNumber++.ToString();
+
+            // 2. تعيين رقم الطلب للكائن (لحل System.FormatException)
+            orderDetails.OrderNumber = newOrderNum;
+
+            // 3. تعيين الحالة الأولية (Pending) إذا لم يتم تعيينها مسبقاً
+            // (لضمان أن الطلب الجديد يبدأ من البداية)
+            if (orderDetails.CurrentState == null)
+            {
+                // 🚨 يجب التأكد أن لديكِ كلاس اسمه PendingState في مساحة الاسم الصحيحة
+                // if (desingPatternsFinalProject.Patterns.PendingState != null)
+                orderDetails.SetState(new PendingState());
+            }
+
+            // 4. إضافة الطلب
             OrdersDB.Add(orderDetails);
+
+            // ملاحظة: لا حاجة لإشعار المراقبين هنا؛ سيتم الإشعار عند تغيير الحالة لاحقاً
         }
 
         public void Attach(IOrderObserver observer, int orderId)

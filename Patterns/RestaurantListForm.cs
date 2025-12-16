@@ -67,7 +67,32 @@ namespace desingPatternsFinalProject.Patterns
             Customer customer = new Customer();
              
             OrderSelectionForm orderForm = new OrderSelectionForm(customer, selectedStore);
-            orderForm.Show();
+            //orderForm.Show();
+            /// 🔑 1.استخدمي ShowDialog() للانتظار حتى يغلق العميل نموذج الطلب(بـ DialogResult.OK)
+            if (orderForm.ShowDialog() == DialogResult.OK)
+            {
+                // 2. التحقق من وجود طلب تم إنشاؤه
+                Order newOrder = orderForm.CreatedOrder;
+
+                if (newOrder != null && newOrder.Items.Count > 0)
+                {
+                    // 🔑 3. إضافة الطلب إلى قاعدة البيانات المركزية (Singleton Pattern)
+                    DeliveryManager.Instance.AddOrder(newOrder);
+
+                    // 🔑 4. فتح نموذج التتبع للطلب الجديد (Observer Pattern)
+                    // نستخدم OrderNumber للتعرف عليه
+                    OrderTrackingForm trackingForm = new OrderTrackingForm(int.Parse(newOrder.OrderNumber));
+
+                    // استخدمي Show() لفتحها بشكل غير حاصر (Non-modal)
+                    trackingForm.Show();
+
+                    MessageBox.Show($"تم إرسال طلبك رقم {newOrder.OrderNumber} بنجاح! \nتم فتح نافذة التتبع الحية.", "تأكيد الطلب");
+                }
+                else
+                {
+                    MessageBox.Show("لم يتم إنشاء الطلب أو السلة فارغة.", "إلغاء الطلب");
+                }
+            }
 
             // this.Hide();
         }

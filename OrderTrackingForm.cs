@@ -1,85 +1,117 @@
 ﻿using System;
-using System.Linq; // أضيف لاستخدام Find
+using System.Linq;
 using System.Windows.Forms;
-using desingPatternsFinalProject.Patterns.Creational; // لـ DeliveryManager
-// 🚨 نغير الواجهة إلى IOrderObserver التي سنعدلها لتقبل رقم الطلب
+using desingPatternsFinalProject.Patterns.Creational;
 using desingPatternsFinalProject.Behavioral;
 using DeliverySystem.Patterns.Creational;
 
 namespace desingPatternsFinalProject
 {
-    // 🚨 1. تغيير الواجهة إلى IOrderObserver (يجب عليكِ تعديلها في الملف الأصلي)
     public partial class OrderTrackingForm : Form, IOrderObserver
     {
-        // متغيرات لتخزين رقم الطلب الحالي والاسم
         private int _orderIdToTrack;
 
-        // 🚨🚨 2. إضافة المُنشئ الذي يقبل رقم الطلب (لحماية من خطأ CS1729)
         public OrderTrackingForm(int orderId)
         {
             InitializeComponent();
             _orderIdToTrack = orderId;
             this.Text = $"تتبع الطلب رقم: {_orderIdToTrack}";
 
-            // 💡 عرض الحالة الأولية (اختياري)
             this.Load += OrderTrackingForm_Load;
         }
 
-        // 💡 إبقاء المنشئ الافتراضي إذا كان ضرورياً لـ InitializeComponent
         public OrderTrackingForm() : this(0) { }
 
 
         private void OrderTrackingForm_Load(object sender, EventArgs e)
         {
-            // 🚨 3. ربط المراقب بالـ DeliveryManager، وتمرير رقم الطلب
-            // (يفترض أن دالة Attach في DeliveryManager أصبحت تقبل رقم الطلب)
+            // 1. ربط المراقب بالـ DeliveryManager
             DeliveryManager.Instance.Attach(this, _orderIdToTrack);
 
-            // محاولة إيجاد Label باسم lblCurrentStatus لعرض الحالة الأولية
-            var statusLabel = this.Controls.Find("lblCurrentStatus", true).FirstOrDefault() as Label;
-            if (statusLabel != null)
+            // 2. عرض التفاصيل الأولية (Strategy + State)
+            LoadOrderDetails();
+        }
+
+        // ===============================================================
+        // 🔑 دالة: تحميل تفاصيل الطلب الثابتة والمحدثة (Strategy + State)
+        // ===============================================================
+        private void LoadOrderDetails()
+        {
+            // البحث عن كائن الطلب في قاعدة البيانات (Singleton)
+            string orderNumStr = _orderIdToTrack.ToString();
+            var order = DeliveryManager.Instance.OrdersDB
+                .FirstOrDefault(o => o.OrderNumber == orderNumStr);
+
+            if (order == null)
             {
-                statusLabel.Text = $"بدء تتبع الطلب {_orderIdToTrack}...";
+                MessageBox.Show("لم يتم العثور على الطلب المطلوب تتبعه.");
+                return;
+            }
+
+            // تحديث العناصر الثابتة (Strategy Pattern)
+            SetLabelText("lblDeliveryType", order.GetDeliveryType());
+            SetLabelText("lblEstimateTime", order.GetDeliveryEstimate());
+            SetLabelText("lblTotalAmount", order.CalculateTotal().ToString("C"));
+
+            // تحديث الحالة الحالية (State Pattern)
+            SetLabelText("lblCurrentStatus", order.GetStatusString());
+
+            // معلومات الطلب الأساسية
+            SetLabelText("lblOrderNumber", order.OrderNumber);
+            SetLabelText("lblStoreName", order.StoreName);
+        }
+
+        // دالة مساعدة لتحديث النصوص بناءً على الاسم البرمجي
+        private void SetLabelText(string labelName, string text)
+        {
+            var label = this.Controls.Find(labelName, true).FirstOrDefault() as Label;
+            if (label != null)
+            {
+                label.Text = text;
             }
         }
 
+        // دالة مساعدة لإضافة التحديثات للسجل
+        private void UpdateLog(string message)
+        {
+            var logTextBox = this.Controls.Find("txtLiveUpdates", true).FirstOrDefault() as TextBox;
+            if (logTextBox != null)
+            {
+                logTextBox.AppendText($"{DateTime.Now:HH:mm:ss} - {message}{Environment.NewLine}");
+            }
+        }
+
+
         // ===============================================
-        // تنفيذ واجهة IOrderObserver (المعدلة)
+        // تنفيذ واجهة IOrderObserver (يتم تحديثها بالكامل هنا)
         // ===============================================
-        // 🚨 4. تعديل دالة Update لتتلقى رقم الطلب ورسالة الحالة
         public void Update(int updatedOrderId, string statusMessage)
         {
-            // 🔑 الخطوة الحاسمة: التأكد من أن التحديث يخص الطلب الذي نراقبه فقط
             if (updatedOrderId != _orderIdToTrack)
             {
-                return; // تجاهل أي تحديث لا يخص هذا الطلب
+                return;
             }
 
-            // يجب استخدام Invoke إذا كان التحديث يحدث من ثريد مختلف
             if (this.InvokeRequired)
             {
                 this.Invoke(new Action<int, string>(Update), updatedOrderId, statusMessage);
             }
             else
             {
-                // البحث عن Label باسم lblCurrentStatus لعرض الرسالة
-                var statusLabel = this.Controls.Find("lblCurrentStatus", true).FirstOrDefault() as Label;
+                // 1. تحديث سجل التحديثات الحية (Observer Feed)
+                UpdateLog(statusMessage);
 
-                if (statusLabel != null)
-                {
-                    statusLabel.Text = statusMessage;
-                }
-                else
-                {
-                    // حل احتياطي: استخدام MessageBox
-                    MessageBox.Show(statusMessage, $"تحديث الطلب {_orderIdToTrack}");
-                }
+                // 2. تحديث Label الحالة الحالية بالرسالة
+                SetLabelText("lblCurrentStatus", statusMessage);
+
+                // 3. 🔑 إعادة تحميل التفاصيل لتحديث كل شيء آخر (Strategy/State Visuals)
+                LoadOrderDetails();
             }
         }
 
         private void OrderTrackingForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            // 🚨 5. فصل المراقب عند الإغلاق وتمرير رقم الطلب
+            // فصل المراقب عند الإغلاق
             DeliveryManager.Instance.Detach(this, _orderIdToTrack);
         }
     }
