@@ -12,15 +12,55 @@ namespace desingPatternsFinalProject.Patterns.Creational
     {
         private static DatabaseManager _instance;
 
-        // 🚨🚨 2. نص الاتصال المُعدّل ليعمل على جهازك 🚨🚨
-        // تم استبدال Data Source=. بـ Data Source=DESKTOP-E2HTT0B\SQLEXPRESS
-        // ✅ النص الجديد (لفرض استخدام TCP/IP):
-        // في ملف DatabaseManager.cs
-        // في ملف DatabaseManager.cs
+        private static string ConnectionString = @"Data Source=.;Initial Catalog=DeliveryProDB;Integrated Security=True";
+        private DatabaseManager() { }
+        public static DatabaseManager GetInstance()
+        {
+            if (_instance == null)
+            {
+                _instance = new DatabaseManager();
+            }
+            return _instance;
+        }
+
+        public static SqlConnection GetConnection()
+        {
+            return new SqlConnection(ConnectionString);
+        }
+
+        public void ExecuteQuery(string query, SqlParameter[] parameters = null)
+        {
+            using (SqlConnection conn = GetConnection())
+            {
+                SqlCommand cmd = new SqlCommand(query, conn);
+                if (parameters != null) cmd.Parameters.AddRange(parameters);
+
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public object ExecuteScalar(string query, SqlParameter[] parameters = null)
+        {
+            using (SqlConnection conn = GetConnection())
+            {
+                SqlCommand cmd = new SqlCommand(query, conn);
+                if (parameters != null) cmd.Parameters.AddRange(parameters);
+
+                conn.Open();
+                return cmd.ExecuteScalar();
+            }
+        }
+    }
+    /*
+    public class DatabaseManager
+    {
+        private static DatabaseManager _instance;
+
         // استخدمنا localhost (عنوان الجهاز المحلي) مع تحديد المنفذ 1433 لفرض TCP/IP
-        public static string ConnectionString = @"Data Source=127.0.0.1,1433;Initial Catalog=DeliveryProDB;Integrated Security=True";
+        //public static string ConnectionString = @"Data Source=127.0.0.1,1433;Initial Catalog=DeliveryProDB;Integrated Security=True";
         // أو:
-        // public static string ConnectionString = @"Data Source=localhost,1433;Initial Catalog=DeliveryProDB;Integrated Security=True"; 
+        public static string ConnectionString = @"Data Source=localhost,1433;Initial Catalog=DeliveryProDB;Integrated Security=True"; 
         private SqlConnection _connection;
 
         // 3. الكونستركتور (Private) - عشان نمنع أي حد يقول new DatabaseManager()
@@ -139,4 +179,5 @@ namespace desingPatternsFinalProject.Patterns.Creational
             }
         }
     }
+    */
 }

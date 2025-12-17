@@ -7,6 +7,7 @@ using DeliverySystem.Patterns.Creational;
 using desingPatternsFinalProject.Patterns;
 // 🔑 يجب التأكد من مساحة اسم OrderFactory، أفترض أنها في:
 using DeliverySystem.Patterns.Creational;
+using static DeliverySystem.Patterns.Creational.ShopOrder;
 
 
 namespace desingPatternsFinalProject.Patterns.Creational
@@ -23,10 +24,11 @@ namespace desingPatternsFinalProject.Patterns.Creational
 
         private DeliveryManager()
         {
+           
             OrdersDB = new List<Order>();
             StoresDB = new List<Store>();
             _orderObservers = new Dictionary<int, List<IOrderObserver>>();
-
+/*
             // تهيئة بيانات المتاجر
             var burgerKing = new Store("Burger King", StoreCategory.FoodAndCoffee);
             burgerKing.Menu.Add(new Product { Name = "Whopper Meal", Price = 25 });
@@ -42,6 +44,7 @@ namespace desingPatternsFinalProject.Patterns.Creational
 
             // 🔑 الاستدعاء يحدث هنا:
             InitializeDummyOrders();
+            */
         }
 
         public static DeliveryManager Instance
@@ -64,12 +67,12 @@ namespace desingPatternsFinalProject.Patterns.Creational
             // ❌ تم إزالة: if (OrdersDB.Count > 0) return;
             // 🔑 التصحيح: مسح القائمة لضمان إعادة تعبئتها في كل مرة
             OrdersDB.Clear();
-
+            /*
             Customer customer1 = new Customer { FullName = "أحمد محمد", Phone = "091xxxxxxx" };
             Customer customer2 = new Customer { FullName = "فاطمة علي", Phone = "092xxxxxxx" };
 
             // الطلب رقم 1: حالة قيد التحضير (Cooking)
-            Order order1 = OrderFactory.CreateOrder(StoreCategory.FoodAndCoffee, customer1, "مطعم الوجبة السريعة");
+            Order order1 = OrderFactory.CreateOrder(customer1, "مطعم الوجبة السريعة");
             order1.AddItem(new Product { Name = "بيتزا", Price = 15.0m }, 1);
             order1.AddItem(new Product { Name = "مشروب غازي", Price = 2.0m }, 2);
             order1.OrderNumber = "1001";
@@ -90,6 +93,7 @@ namespace desingPatternsFinalProject.Patterns.Creational
             order2.NextState();
 
             OrdersDB.Add(order2);
+            */
         }
 
         // =========================================================
@@ -116,7 +120,7 @@ namespace desingPatternsFinalProject.Patterns.Creational
 
             // 4. إضافة الطلب
             OrdersDB.Add(orderDetails);
-
+            
             // ملاحظة: لا حاجة لإشعار المراقبين هنا؛ سيتم الإشعار عند تغيير الحالة لاحقاً
         }
 

@@ -10,12 +10,17 @@ using System.Windows.Forms;
 using DeliverySystem.Patterns.Creational;
 using desingPatternsFinalProject.Patterns.Creational;
 using desingPatternsFinalProject.Behavioral.Strategy;
+using desingPatternsFinalProject.Patterns;
+using static DeliverySystem.Patterns.Creational.ShopOrder;
 namespace desingPatternsFinalProject
 {
     public partial class OrderSelectionForm : Form
     {
-        private Customer _customer;
-        private Store _store;
+        //private Customer _customer;
+        private User _currentUser;
+        private Store _currentStore;
+        private StoreRepository _repo;
+        private List<Product> _allProducts;
         private BindingList<OrderItem> _cartItems;
         public Order CreatedOrder { get; private set; }
 
@@ -24,10 +29,11 @@ namespace desingPatternsFinalProject
         public OrderSelectionForm(Customer customer, Store store)
         {
             InitializeComponent();
-            _customer = customer;
-            _store = store; 
-
+            _currentUser = customer ;
+            _currentStore = store;
+            _repo = new StoreRepository();
             _cartItems = new BindingList<OrderItem>();
+
             dgvCart.DataSource = _cartItems;
         }
 
@@ -52,16 +58,32 @@ namespace desingPatternsFinalProject
         }
         private void OrderSelectionForm_Load(object sender, EventArgs e)
         {
-            this.Text = $"التسوق من: {_store.Name}";
+            this.Text = $"التسوق من: {_currentStore.Name}";
 
-            Menu.DataSource = _store.Menu;
+            Menu.DataSource = _repo.GetProductsByStore(_currentStore.ID);
             Menu.DisplayMember = "Name";
+            dgvCart.AutoGenerateColumns = true;
+            /*
+            try
+            {
+                // نخفوا الكائن الأساسي لأنه ما ينعرضش كنص
+                dgvCart.Columns["Product"].Visible = false;
 
-            lblTotal.Text = "0.00 $";
+                // نعدلوا أسماء الأعمدة الظاهرة (نربطوها بالخصائص اللي درناها في الكلاس)
+                dgvCart.Columns["ShowName"].HeaderText = "Product";
+                dgvCart.Columns["ShowPrice"].HeaderText = "Price";
+                dgvCart.Columns["ShowQuantity"].HeaderText = "Quantity";
 
-            // 🔑 تعيين الاستراتيجية العادية كافتراض واختيار زرها
-            rdbNormalDelivery.Checked = true;
-            UpdateTotal(); // تحديث الإجمالي عند التحميل
+                // ترتيبهم (اختياري)
+                dgvCart.Columns["ShowName"].DisplayIndex = 0;
+                dgvCart.Columns["ShowPrice"].DisplayIndex = 1;
+                dgvCart.Columns["ShowQuantity"].DisplayIndex = 2;
+            }
+            catch { }
+            */
+            lblTotal.Text = "0.00 DLY";
+
+            //lblTotal.Text = "0.00 $"; // تحديث الإجمالي عند التحميل
         }
         private void lstMenu_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -90,7 +112,7 @@ namespace desingPatternsFinalProject
                 return;
             }
             // 1. إنشاء الطلب
-            CreatedOrder = OrderFactory.CreateOrder(_store.Category, _customer, _store.Name);
+            CreatedOrder = OrderFactory.CreateOrder( _currentUser, _currentStore );
 
             // 🔑 2. تعيين الاستراتيجية النهائية للطلب بناءً على اختيار العميل
             IDeliveryStrategy finalStrategy = GetSelectedDeliveryStrategy();
@@ -131,7 +153,7 @@ namespace desingPatternsFinalProject
             }
 
             // 1. إنشاء طلب وهمي مؤقت لحساب التكاليف
-            Order tempOrder = OrderFactory.CreateOrder(_store.Category, _customer, _store.Name);
+            Order tempOrder = OrderFactory.CreateOrder( _currentUser, _currentStore);
 
             // 2. إضافة العناصر إلى الطلب المؤقت
             foreach (var item in _cartItems)
@@ -158,17 +180,19 @@ namespace desingPatternsFinalProject
 
         }
 
-        private void btnTrackOrder_Click(object sender, EventArgs e)
+         private void btnTrackOrder_Click(object sender, EventArgs e)
         {
             // 1. إنشاء نموذج التتبع الجديد
-            OrderTrackingForm trackingForm = new OrderTrackingForm();
+            /*
+             * OrderTrackingForm trackingForm = new OrderTrackingForm();
 
             // 2. فتحه. (نستخدم Show() ليبقى نموذج العميل الرئيسي فعالاً)
             trackingForm.Show();
 
-            // 💡 يمكن هنا إضافة رسالة تنبيه للعميل (اختياري)
+             // 💡 يمكن هنا إضافة رسالة تنبيه للعميل (اختياري)
+            */
             MessageBox.Show("تم فتح شاشة التتبع. ستصلك الإشعارات فور تحديث الطلب من قبل الإدارة.", "بدء التتبع");
-        }
+        } 
         // 🔑 4. دالة معالجة حدث تغيير خيارات التوصيل (مربوطة بـ 3 أزرار راديو)
         private void rdbNormalDelivery_CheckedChanged(object sender, EventArgs e)
         {

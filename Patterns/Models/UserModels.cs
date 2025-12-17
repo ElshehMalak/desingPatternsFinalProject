@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace desingPatternsFinalProject.Patterns.Creational
 {
-// 1. الكلاس الأب (Abstract: يعني ما نقدروش نصنعو يوزر حاف، لازم يكون يا زبون يا سائق)
+    // 1. الكلاس الأب (Abstract: يعني ما نقدروش نصنعو يوزر حاف، لازم يكون يا زبون يا سائق)
     public abstract class User
     {
         public int ID { get; set; }
@@ -15,13 +15,14 @@ namespace desingPatternsFinalProject.Patterns.Creational
         public string Email { get; set; }
         public string Phone { get; set; }
         public string UserType { get; set; } // "Customer" or "Driver"
+        public object Password { get; internal set; }
     }
 
     // 2. كلاس الزبون (يرث من User)
     public class Customer : User
     {
         public int LoyaltyPoints { get; set; }
-        public Customer() 
+        public Customer()
         {
             UserType = "Customer"; // نحدد النوع تلقائياً
         }
@@ -37,52 +38,46 @@ namespace desingPatternsFinalProject.Patterns.Creational
     }
 
     //Factory Pattern - كلاس المصنع لإنشاء المستخدمين
-    public class UserFactory
+    public static class UserFactory
     {
-        // دالة لتسجيل سائق جديد (تخزن في جدولين)
-        public static void RegisterDriver(string name, string email, string phone, string pass, string license, string vehicle)
+        public static User CreateUser(string type, string name, string email, string phone, string password)
         {
-            using (SqlConnection conn = new SqlConnection(DatabaseManager.ConnectionString)) // تأكدي إن عندك ConnectionString
+            // 1. لو طلبنا زبون
+            if (type == "Customer")
             {
-                conn.Open();
-                SqlTransaction transaction = conn.BeginTransaction(); // نبدأ عملية آمنة
-
-                try
+                return new Customer
                 {
-                    // 1. إدخال في جدول Users
-                    string sqlUser = @"INSERT INTO Users (FullName, Email, Phone, PasswordHash, UserType) 
-                                   VALUES (@Name, @Email, @Phone, @Pass, 'Driver'); 
-                                   SELECT SCOPE_IDENTITY();";
-
-                    SqlCommand cmdUser = new SqlCommand(sqlUser, conn, transaction);
-                    cmdUser.Parameters.AddWithValue("@Name", name);
-                    cmdUser.Parameters.AddWithValue("@Email", email);
-                    cmdUser.Parameters.AddWithValue("@Phone", phone);
-                    cmdUser.Parameters.AddWithValue("@Pass", pass);
-
-                    // ناخذ الـ ID الجديد المولد
-                    int newID = Convert.ToInt32(cmdUser.ExecuteScalar());
-
-                    // 2. إدخال في جدول Drivers (بنفس الـ ID)
-                    string sqlDriver = @"INSERT INTO Drivers (DriverID, LicenseNumber, VehicleType, CurrentStatus) 
-                                     VALUES (@ID, @License, @Vehicle, 'Offline')";
-
-                    SqlCommand cmdDriver = new SqlCommand(sqlDriver, conn, transaction);
-                    cmdDriver.Parameters.AddWithValue("@ID", newID);
-                    cmdDriver.Parameters.AddWithValue("@License", license);
-                    cmdDriver.Parameters.AddWithValue("@Vehicle", vehicle);
-
-                    cmdDriver.ExecuteNonQuery();
-
-                    transaction.Commit(); // اعتمد التغييرات
-                }
-                catch (Exception)
+                    FullName = name,
+                    Email = email,
+                    Phone = phone,
+                    Password = password,
+                    UserType = "Customer"
+                    // LoyaltyPoints حتقعد 0 افتراضياً
+                };
+            }
+            // 2. لو طلبنا سائق
+            else if (type == "Driver")
+            {
+                return new Driver
                 {
-                    transaction.Rollback(); 
-                    throw; 
-                }
+                    FullName = name,
+                    Email = email,
+                    Phone = phone,
+                    Password = password,
+                    UserType = "Driver"
+                    // بيانات السيارة والرخصة نعبوها بعدين في الفورم
+                };
+            }
+            // 3. لو نوع غير معروف
+            else
+            {
+                return null;
+                // أو تقدري تديري: throw new Exception("نوع المستخدم غير معروف");
             }
         }
+    }
+}
+        /*
         public static void RegisterCustomer(string name, string email, string phone, string pass)
         {
             using (SqlConnection conn = new SqlConnection(DatabaseManager.ConnectionString))
@@ -125,3 +120,4 @@ namespace desingPatternsFinalProject.Patterns.Creational
         }
     }
 }
+        */

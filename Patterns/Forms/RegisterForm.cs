@@ -13,6 +13,7 @@ namespace desingPatternsFinalProject.Patterns
 {
     public partial class RegisterForm : Form
     {
+        private IUserRepository _userRepo;
         public RegisterForm()
         {
             InitializeComponent();
@@ -57,61 +58,60 @@ namespace desingPatternsFinalProject.Patterns
                 MessageBox.Show("Please fill in all basic fields.", "Missing Data", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            if (DatabaseManager.GetInstance().IsEmailExists(txtEmail.Text))
+
+            // فحص رقم الهاتف
+            if (_userRepo.IsPhoneExist(txtPhone.Text))
             {
-                MessageBox.Show("This email address is already registered!\nPlease login or use a different email.",
-                                "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-
-                txtEmail.Focus();
-                txtEmail.SelectAll();
-
-                return; // وقف الكود
+                MessageBox.Show("This Phone Number is already registered!\nPlease login.", "Duplicate Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
             }
+
+            // فحص الإيميل (تأكدي أن دالة IsEmailExist موجودة في الريبوزيتوري)
+            if (_userRepo.IsEmailExist(txtEmail.Text))
+            {
+                MessageBox.Show("This Email Address is already registered!", "Duplicate Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // 3️⃣ تجهيز البيانات (Factory Pattern)
+            string type = rbDriver.Checked ? "Driver" : "Customer";
 
             try
             {
-              
-                if (rbDriver.Checked)
+                User newUser = UserFactory.CreateUser(type, txtName.Text, txtEmail.Text, txtPhone.Text, txtPassword.Text);
+
+                if (newUser is Driver driver)
                 {
-        
                     if (string.IsNullOrWhiteSpace(txtLicense.Text) || string.IsNullOrWhiteSpace(txtVehicle.Text))
                     {
-                        MessageBox.Show("Driver details (License & Vehicle) are required!", "Missing Data", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show("Please fill in License and Vehicle details for Drivers.", "Missing Data", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         return;
                     }
 
-                    UserFactory.RegisterDriver(
-                        txtName.Text,
-                        txtEmail.Text,
-                        txtPhone.Text,
-                        txtPassword.Text,
-                        txtLicense.Text,
-                        txtVehicle.Text
-                    );
+                    driver.LicenseNumber = txtLicense.Text;
+                    driver.VehicleType = txtVehicle.Text;
+                }
 
-                    MessageBox.Show("Driver Account Created Successfully! 🚚");
+                //  الحفظ في قاعدة البيانات (Repository Pattern)
+                bool isSuccess = _userRepo.Register(newUser);
+
+                if (isSuccess)
+                {
+                    MessageBox.Show("Account Created Successfully! 🎉", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    // الانتقال لشاشة الدخول
+                    LoginForm login = new LoginForm();
+                    login.Show();
+                    this.Hide();
                 }
                 else
                 {
-                
-                    UserFactory.RegisterCustomer(
-                        txtName.Text,
-                        txtEmail.Text,
-                        txtPhone.Text,
-                        txtPassword.Text
-                    );
-
-                    MessageBox.Show("Customer Account Created Successfully! 🍔");
+                    MessageBox.Show("Registration Failed! Please try again later.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
-
-                LoginForm login = new LoginForm();
-                login.Show();
-                this.Hide();
-
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Registration Failed: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("An error occurred: " + ex.Message, "System Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

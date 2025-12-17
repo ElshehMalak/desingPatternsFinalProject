@@ -8,7 +8,7 @@ using DeliverySystem.Patterns.Creational;
 
 
 namespace desingPatternsFinalProject.Patterns
-{ 
+{ /*
     public static class MockData
     {
         public static List<Store> AllStores = new List<Store>();
@@ -31,4 +31,5 @@ namespace desingPatternsFinalProject.Patterns
             AllStores.Add(burgerStore);
         }
     }
+    */
 }

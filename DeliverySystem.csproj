@@ -49,91 +49,94 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CustomerMainForm.cs">
+    <Compile Include="Patterns\Forms\CheckoutForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="CustomerMainForm.Designer.cs">
+    <Compile Include="Patterns\Forms\CheckoutForm.Designer.cs">
+      <DependentUpon>CheckoutForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Patterns\Forms\CustomerMainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Patterns\Forms\CustomerMainForm.Designer.cs">
       <DependentUpon>CustomerMainForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="DeliveryManagementForm.cs">
+    <Compile Include="Patterns\Forms\DeliveryManagementForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="DeliveryManagementForm.Designer.cs">
+    <Compile Include="Patterns\Forms\DeliveryManagementForm.Designer.cs">
       <DependentUpon>DeliveryManagementForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="mainForm.cs">
+    <Compile Include="Patterns\Forms\OrderSelectionForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="mainForm.Designer.cs">
-      <DependentUpon>mainForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="OrderSelectionForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="OrderSelectionForm.Designer.cs">
+    <Compile Include="Patterns\Forms\OrderSelectionForm.Designer.cs">
       <DependentUpon>OrderSelectionForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="OrderTrackingForm.cs">
+    <Compile Include="Patterns\Forms\OrderTrackingForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="OrderTrackingForm.Designer.cs">
+    <Compile Include="Patterns\Forms\OrderTrackingForm.Designer.cs">
       <DependentUpon>OrderTrackingForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Patterns\behavioral\IOrderObserver.cs" />
-    <Compile Include="Patterns\behavioral\ISubject.cs" />
-    <Compile Include="Patterns\behavioral\OrderStatePattern.cs" />
-    <Compile Include="Patterns\behavioral\Strategy\ExpressDelivery.cs" />
-    <Compile Include="Patterns\behavioral\Strategy\IDeliveryStrategy.cs" />
-    <Compile Include="Patterns\behavioral\Strategy\NormalDelivery.cs" />
-    <Compile Include="Patterns\behavioral\Strategy\PickupDelivery.cs" />
-    <Compile Include="Patterns\Creational\DatabaseManager.cs" />
-    <Compile Include="Patterns\Creational\DeliveryManager.cs" />
-    <Compile Include="Patterns\Creational\Factory.cs" />
-    <Compile Include="Patterns\Creational\UserModels.cs" />
-    <Compile Include="Patterns\Creational\UserSession.cs" />
-    <Compile Include="Patterns\LoginForm.cs">
+    <Compile Include="Patterns\Services\Tracking\IOrderObserver.cs" />
+    <Compile Include="Patterns\Services\Tracking\ISubject.cs" />
+    <Compile Include="Patterns\Services\Tracking\OrderStatePattern.cs" />
+    <Compile Include="Patterns\Services\DeliveryServices\ExpressDelivery.cs" />
+    <Compile Include="Patterns\Services\DeliveryServices\IDeliveryStrategy.cs" />
+    <Compile Include="Patterns\Services\DeliveryServices\NormalDelivery.cs" />
+    <Compile Include="Patterns\Services\DeliveryServices\PickupDelivery.cs" />
+    <Compile Include="Patterns\Data\DatabaseManager.cs" />
+    <Compile Include="Patterns\Data\DeliveryManager.cs" />
+    <Compile Include="Patterns\Models\Factory.cs" />
+    <Compile Include="Patterns\Models\UserModels.cs" />
+    <Compile Include="Patterns\Core\UserSession.cs" />
+    <Compile Include="Patterns\Data\Repositories\IUserRepository.cs" />
+    <Compile Include="Patterns\Forms\LoginForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Patterns\LoginForm.Designer.cs">
+    <Compile Include="Patterns\Forms\LoginForm.Designer.cs">
       <DependentUpon>LoginForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Patterns\MockData.cs" />
-    <Compile Include="Patterns\RegisterForm.cs">
+    <Compile Include="Patterns\Forms\RegisterForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Patterns\RegisterForm.Designer.cs">
+    <Compile Include="Patterns\Forms\RegisterForm.Designer.cs">
       <DependentUpon>RegisterForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Patterns\RestaurantListForm.cs">
+    <Compile Include="Patterns\Forms\RestaurantListForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Patterns\RestaurantListForm.Designer.cs">
+    <Compile Include="Patterns\Forms\RestaurantListForm.Designer.cs">
       <DependentUpon>RestaurantListForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Patterns\Data\Repositories\UserRepository.cs" />
+    <Compile Include="Patterns\Data\Repositories\StoreRepository.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="CustomerMainForm.resx">
+    <EmbeddedResource Include="Patterns\Forms\CheckoutForm.resx">
+      <DependentUpon>CheckoutForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Patterns\Forms\CustomerMainForm.resx">
       <DependentUpon>CustomerMainForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="DeliveryManagementForm.resx">
+    <EmbeddedResource Include="Patterns\Forms\DeliveryManagementForm.resx">
       <DependentUpon>DeliveryManagementForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="mainForm.resx">
-      <DependentUpon>mainForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="OrderSelectionForm.resx">
+    <EmbeddedResource Include="Patterns\Forms\OrderSelectionForm.resx">
       <DependentUpon>OrderSelectionForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="OrderTrackingForm.resx">
+    <EmbeddedResource Include="Patterns\Forms\OrderTrackingForm.resx">
       <DependentUpon>OrderTrackingForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Patterns\LoginForm.resx">
+    <EmbeddedResource Include="Patterns\Forms\LoginForm.resx">
       <DependentUpon>LoginForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Patterns\RegisterForm.resx">
+    <EmbeddedResource Include="Patterns\Forms\RegisterForm.resx">
       <DependentUpon>RegisterForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Patterns\RestaurantListForm.resx">
+    <EmbeddedResource Include="Patterns\Forms\RestaurantListForm.resx">
       <DependentUpon>RestaurantListForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -160,7 +163,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Patterns\NewFolder1\" />
+    <Folder Include="Patterns\Services\PaymentAdapters\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -15,7 +15,7 @@ namespace desingPatternsFinalProject
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            MockData.InitData();
+            //MockData.InitData();
             Application.Run(new RegisterForm());
 
         }

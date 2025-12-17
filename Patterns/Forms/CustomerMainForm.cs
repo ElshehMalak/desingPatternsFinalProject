@@ -67,7 +67,7 @@ namespace desingPatternsFinalProject
         private void Form1_Load(object sender, EventArgs e)
         {
             // نفترض أن UserSession كائن موجود
-            // lblWelcome.Text = "Welcome, " + UserSession.CurrentUserName + " 👋";
+            lblWelcome.Text = "Welcome, " + UserSession.CurrentUserName + " 👋";
         }
 
         private void tabPage1_Click(object sender, EventArgs e)
@@ -218,7 +218,7 @@ namespace desingPatternsFinalProject
 
         private void btnRestaurants_Click(object sender, EventArgs e)
         {
-              RestaurantListForm foodForm = new RestaurantListForm(); 
+              RestaurantListForm foodForm = new RestaurantListForm("Mix"); 
              foodForm.Show();
         }
 
@@ -239,9 +239,9 @@ namespace desingPatternsFinalProject
 
         private void btnLogOut_Click(object sender, EventArgs e)
         {
-            // UserSession.ClearSession(); 
-            // LoginForm login = new LoginForm(); 
-            // login.Show();
+            UserSession.ClearSession(); 
+            LoginForm login = new LoginForm(); 
+            login.Show();
             this.Close();
         }
 

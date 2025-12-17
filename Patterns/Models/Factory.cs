@@ -18,25 +18,21 @@ namespace DeliverySystem.Patterns.Creational
             SpecialDelivery 
         }
 
-        public class Store
+    public class Store
+    {
+        public int ID { get; set; }
+        public string Name { get; set; }
+        public string Category { get; set; } // ⚠️ غيرناه String ليطابق الداتا بيس
+        public decimal Rating { get; set; }
+        public decimal DeliveryFee { get; set; }
+        public string ImagePath { get; set; }
+        public List<Product> Menu { get; set; }
+
+        public Store()
         {
-            public string Name { get; set; }
-            public StoreCategory Category { get; set; }
-            public List<Product> Menu { get; set; }
-            public Store(string name, StoreCategory category)
-            {
-                Name = name;
-                Category = category;
-                Menu = new List<Product>();
-            }
+            Menu = new List<Product>();
         }
-    /*
-        public class Customer
-        {
-            public string Name { get; set; }
-            public string Phone { get; set; }
-        }
-    */
+    }
         public class Product
         {
             public string Name { get; set; }
@@ -54,6 +50,7 @@ namespace DeliverySystem.Patterns.Creational
         {
             public string OrderNumber { get; set; }
             public User Customer { get; set; }
+            public int StoreID { get; set; }
             public StoreCategory Category { get; set; }
             public string StoreName { get; set; }
             public List<OrderItem> Items { get; set; }
@@ -63,22 +60,26 @@ namespace DeliverySystem.Patterns.Creational
         // =========================================================
         // 🔑 إضافة نمط Strategy (الـ Context)
         // =========================================================
-        public IDeliveryStrategy DeliveryStrategy { get; private set; }
-        public Order(Customer customer, StoreCategory category, string storeName)
-            {
-               this.Customer = customer as User;
-                Category = category;
-                StoreName = storeName;
-                Items = new List<OrderItem>();
-                OrderDate = DateTime.Now;
-                OrderNumber = GenerateOrderNumber();
-            // 💡 تعيين استراتيجية توصيل افتراضية (Normal) عند إنشاء الطلب
-            SetDeliveryStrategy(new NormalDelivery());
+        public Order(User customer, Store store, StoreCategory category)
+        {
+            Customer = customer;
+            StoreID = store.ID;
+            StoreName = store.Name;
+
+            // نربط التصنيف اللي جاي من الابن
+            Category = category;
+
+            Items = new List<OrderItem>();
+            OrderDate = DateTime.Now;
+
+            // توا نقدروا نكونوا رقم الطلب لأن Category عندنا قيمتها
+            OrderNumber = GenerateOrderNumber();
             CurrentState = new PendingState();
-            }
+        }
         // =========================================================
         // دوال Strategy
         // =========================================================
+        public IDeliveryStrategy DeliveryStrategy { get; private set; }
 
         public void SetDeliveryStrategy(IDeliveryStrategy strategy)
         {
@@ -153,7 +154,7 @@ namespace DeliverySystem.Patterns.Creational
     }
         public class FoodAndCoffeeOrder : Order
         {
-            public FoodAndCoffeeOrder(Customer customer, string storeName) : base(customer, StoreCategory.FoodAndCoffee, storeName) { }
+            public FoodAndCoffeeOrder(User customer, Store place) : base(customer, place, StoreCategory.FoodAndCoffee) { }
 
             public override string ProcessOrder()
             {
@@ -162,16 +163,22 @@ namespace DeliverySystem.Patterns.Creational
         }
         public class ShopOrder : Order
         {
-            public ShopOrder(Customer customer, string storeName) : base(customer, StoreCategory.Shop , storeName) { }
+        public ShopOrder(User customer, Store place)
+            : base(customer, place, StoreCategory.Shop)
+        {
+        }
 
-            public override string ProcessOrder()
-            {
-                return "🛍️ المتجر: جاري تجهيز القطع ووضعها في أكياس التسوق الأنيقة.";
-            }
+        public override string ProcessOrder()
+        {
+            return "🛍️ المتجر: جاري تجهيز القطع ووضعها في أكياس التسوق الأنيقة.";
+
         }
         public class SupermarketOrder : Order
         {
-            public SupermarketOrder(Customer customer, string storeName) : base(customer, StoreCategory.Supermarket, storeName) { }
+            public SupermarketOrder(User customer, Store place)
+                       : base(customer, place, StoreCategory.Supermarket)
+            {
+            }
 
             public override string ProcessOrder()
             {
@@ -180,8 +187,10 @@ namespace DeliverySystem.Patterns.Creational
         }
         public class SpecialDeliveryOrder : Order
         {
-            public SpecialDeliveryOrder(Customer customer, string storeName) : base(customer, StoreCategory.SpecialDelivery , storeName) { }
-
+            public SpecialDeliveryOrder(User customer, Store place)
+                       : base(customer, place, StoreCategory.SpecialDelivery)
+            {
+            }
             public override string ProcessOrder()
             {
                 return "📦 مندوب خاص: التوجه لموقع الاستلام لاستلام الطرد وتسليمه للعميل.";
@@ -189,25 +198,34 @@ namespace DeliverySystem.Patterns.Creational
         }
         public class OrderFactory
         {
-            public static Order CreateOrder(StoreCategory category, Customer customer, string storeName)
+            public static Order CreateOrder(User user, Store place)
             {
-                switch (category)
+                // 1. نتأكد إن مافيش قيمة فارغة
+                if (string.IsNullOrWhiteSpace(place.Category))
+                    return new ShopOrder(user, place); // Default logic
+
+                // 2. ⚠️ تصحيح الخطأ: لازم نسند النتيجة للمتغير
+                string cleanCategory = place.Category.Trim().ToLower();
+
+                // 3. التحقق (Switch Case)
+                switch (cleanCategory)
                 {
-                    case StoreCategory.FoodAndCoffee:
-                        return new FoodAndCoffeeOrder(customer , storeName);
+                    case "restaurant":
+                    case "cafe":
+                    case "fast food":
+                        return new FoodAndCoffeeOrder(user, place);
 
-                    case StoreCategory.Shop:
-                        return new ShopOrder(customer, storeName);
+                    case "supermarket":
+                        return new SupermarketOrder(user, place);
 
-                    case StoreCategory.Supermarket:
-                        return new SupermarketOrder(customer, storeName);
-
-                    case StoreCategory.SpecialDelivery:
-                        return new SpecialDeliveryOrder(customer, storeName);
+                    case "store":
+                    case "pharmacy":
+                        return new ShopOrder(user, place);
 
                     default:
-                        throw new Exception("نوع طلب غير مدعوم");
+                        return new ShopOrder(user, place);
                 }
             }
         }
+    }
 }
